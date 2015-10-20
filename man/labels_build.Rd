@@ -29,6 +29,9 @@ labels_build(pl, p, DF, att)
   \item{att}{
   the attribute list to specify visual and graphical characteristics.
   }
+  \item{flip}{
+  logical to flip labels to landscape
+  }
 }
 
 \value{

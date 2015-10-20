@@ -40,6 +40,7 @@
 #' @param plot.grp.spacing the vertical spacing between groups measured in lines. Defaults to 1.   
 #' @param plot.panel.spacing the vertical spacing between panels measured in lines. Defaults to 1.
 #' @param plot.panel.margins the horizontal spacing between panels measured in lines. THIS IS LEGACY CODE AND SHOULD NOT BE USED.
+#' @param flip logical to make plot landscape
 #' @param ... Additional arguments passed to or from other methods.
 #'   
 #' @return A list of ggplot2 objects with entries for each individual panel.
@@ -229,7 +230,8 @@ mmplot.default <- function(map.data,
   map.spacing = 1,
   plot.pGrp.spacing = 1,
   plot.panel.spacing = 1,
-  plot.panel.margins = c(0,0,1,0)
+  plot.panel.margins = c(0,0,1,0), 
+  flip = FALSE
 ){		
   
   # rename function inputs
@@ -265,13 +267,17 @@ mmplot.default <- function(map.data,
   	plot.height = plot.height,
   	median.row = median.row
     )			
-  
+
   # grab default attribute lists for each panel
   a <- vector("list", nPanels)
   for(p in 1:nPanels) {	
     att.name <- paste(panel.types[p],'_att',sep = '')				# <panel type>.att is the name of the function that creates the 
     att.function <- paste(panel.types[p],'_att()',sep = '')			# 	default attribute list. we check that it exists then run it
     if(exists(att.name)) a[[p]] <- eval(parse(text = att.function)) else a[[p]] <- eval(parse(text = standard_att))
+    
+    # change default margins if flip
+    if(flip) a[[p]]$panel.margins <- a[[p]]$panel.margins[c(4, 1, 2, 3)]
+      
   }
   
   a <- append(a, plot.atts)
@@ -282,8 +288,9 @@ mmplot.default <- function(map.data,
    	
   # all additional specified attributes are now dealt with
   # this loops through each sub list of the panel.att list, then loops through its entries, matching 
-  # 	the names with those in the "a" object. The stored values in "a" are replaced with the users inputs
-  for(j in 1:length(panel.att)){	
+  # the names with those in the "a" object. The stored values in "a" are replaced with the users inputs
+  for(j in 1:length(panel.att)){
+    
     k <- unlist(panel.att[[j]][1], use.names = FALSE)		# the first entry specifies which panel (i.e. which sublist) is being modified
   
     allnames <- names(panel.att[[j]])[-1]			# grab the names of the sublist entries
@@ -294,8 +301,10 @@ mmplot.default <- function(map.data,
   												#	implies so a user may have left it off 
   
   	  # replace the attribute or warn that no attribute by that name was found										
-  	  if(!is.na(w)) a[[k]][[w]] <- unlist(panel.att[[j]][s], use.names = FALSE) else warning(paste('"',s,'"',' is not a recognized attribute for panel type ','"',panel.types[j],'"', sep = ''), call. = FALSE, immediate. = TRUE)
-    }	
+  	  if(!is.na(w)) a[[k]][[w]] <- unlist(panel.att[[j]][s], use.names = FALSE) 
+  	  else warning(paste('"',s,'"',' is not a recognized attribute for panel type ','"',panel.types[j],'"', sep = ''), call. = FALSE, immediate. = TRUE)
+    
+  	}	
   
     if(!is.null(k)){
       w <- match('left.margin', names(a[[k]]))
@@ -304,8 +313,7 @@ mmplot.default <- function(map.data,
       if(!is.na(w) & !is.na(a[[k]][[w]])) 	a[[k]]$panel.margins[2] <- a[[k]]$panel.margins[2] + a[[k]][[w]]
     }
     
-    }
-  
+  }
   
   ### several median options to carry over to the map panel
   a$median.text.color <- median.text.color
@@ -343,8 +351,8 @@ mmplot.default <- function(map.data,
   # 	within perceptual group ranking, and a column specifying if any entry row should be the median row 												
   DF <- create_DF_rank(dStats, ord.by, grouping, median.row, rev.ord, vertical.align)
   
-    # add entries in the attribute list so that information about the median can be passed 
-    # 	among all the panel building and cleaning functions
+  # add entries in the attribute list so that information about the median can be passed 
+  # 	among all the panel building and cleaning functions
   if(any(DF$median)){
     a$m.pGrp <- DF$pGrp[DF$median]
     a$m.rank <- DF$rank[DF$median]
@@ -353,8 +361,8 @@ mmplot.default <- function(map.data,
     a$m.pGrp <- DF$pGrp[DF$rank == floor(a$m.rank)] + .5
   }
   
-    # Many panel plotting functions add extra columns to the DF table. This is
-    #   created here as a reference to default back to after each panel is conctructed
+  # Many panel plotting functions add extra columns to the DF table. This is
+  #   created here as a reference to default back to after each panel is conctructed
   DF.hold <- DF
   a$ncols <- ncol(DF.hold)	# so we can keep track of how many extra columns have been added		
   					# for now, this is only used in "assimilate.plot" function
@@ -365,24 +373,24 @@ mmplot.default <- function(map.data,
       # clear out any NA rows
     dMap <- dMap[!(is.na(dMap$coordsx)|is.na(dMap$coordsy)),]
   
-      # if map.all is not specified we remove all polygons from mapDF that
-      # 	which are not linked to the stat table
+    # if map.all is not specified we remove all polygons from mapDF that
+    # 	which are not linked to the stat table
     w <- match(dMap[,map.link[2]], unique(DF[,map.link[1]]))
     if(!a[[which(panel.types == 'map')]]$map.all) mapDF <- dMap[!is.na(w),] else mapDF <- dMap
   
-      # make sure there is a hole and plug column. If not, just insert dummy columns 
+    # make sure there is a hole and plug column. If not, just insert dummy columns 
     if(!'hole'%in%names(mapDF)) mapDF$hole <- 0
     if(!'plug'%in%names(mapDF)) mapDF$plug <- 0
   
-      # link the pGrp and rank columns for plot order and facetting and
-      #  make sure they're numeric    
+    # link the pGrp and rank columns for plot order and facetting and
+    #  make sure they're numeric    
     tmpDF <- unique(DF[,c('pGrp','rank', map.link[1])])
     w <- match(mapDF[,map.link[2]], tmpDF[,map.link[1]])
     mapDF <- cbind(pGrp = tmpDF$pGrp[w],rank = tmpDF$rank[w], mapDF)
     mapDF$pGrp <- as.numeric(mapDF$pGrp)
     mapDF$rank <- as.numeric(mapDF$rank)
   
-      # link the pGrpOrd column for plot order and facetting
+    # link the pGrpOrd column for plot order and facetting
     tmpDF <- unique(DF[,c('pGrpRank', map.link[1])])
     w <- match(mapDF[,map.link[2]], tmpDF[,map.link[1]])
     mapDF <- cbind(pGrpOrd = tmpDF$pGrpRank[w], mapDF)
@@ -402,11 +410,10 @@ mmplot.default <- function(map.data,
   
     plot.h2w.ratio <- (mapPanelHeight/totalUnitHeight * adj.plot.height) / (mapPanelWidth/totalUnitWidth * plot.width)
   
-  
-      # change coordinates to align properly with other panels
+    # change coordinates to align properly with other panels
     nYrows <- diff(range(mapDF$pGrpOrd[!is.na(mapDF$pGrpOrd)]) + c(-1,1) * .5)  
     nXcols <- nYrows/plot.h2w.ratio		# *mapPanelWidth  
-  
+      
     limitingAxis <- ifelse(diff(range(mapDF$coordsy)) / diff(range(mapDF$coordsx)) > 
   					 plot.h2w.ratio, 'y','x')
   
@@ -427,29 +434,27 @@ mmplot.default <- function(map.data,
     rm(tmpDF)
   }
   
-  
-    # set up a list to store plot objects to be created later
-    # 	note: each panel in the plot is a "ggplot object" 
+  # set up a list to store plot objects to be created later
+  # 	note: each panel in the plot is a "ggplot object" 
   plots <- vector("list", nPanels)
-  
   
   ###############################
   ##### create plot objects #####
   ###############################
-  
-    # each section builds a plot object of the specified type
+
+  # each section builds a plot object of the specified type
   for(p in 1:nPanels){	
   
       if(panel.types[p] == 'map'){
   
-  	  plots[[p]]  <- RankMaps(plots[[p]], p, mapDF, a)
+  	  plots[[p]]  <- RankMaps(plots[[p]], p, mapDF, a, flip = flip)
   
   
         } else if(exists(as.character(paste(panel.types[p],'_build',sep = '')))) {	# all graph types should have a function by the 
   														# same name. first we check to see if such a function does
   														# in fact exist, if so we use "eval(parse(..." to call it
   
-  	  plots[[p]] <- eval(parse(text = paste(panel.types[p],'_build(plots[[p]], p, DF, a)',sep = '')))
+  	  plots[[p]] <- eval(parse(text = paste(panel.types[p],'_build(plots[[p]], p, DF, a, flip = flip)',sep = '')))
        
         } else {
   	
@@ -461,34 +466,35 @@ mmplot.default <- function(map.data,
       DF <- DF.hold	
   }
   
-  
-  
   ##############################
   ##### construct the plot #####
   ##############################
-  lwidth <- pps
-  for(w in 1:length(all_atts(a,'panel.width'))) lwidth <- c(lwidth, all_atts(a,'panel.width')[w], pps)
+
+  if(flip){
+      
+    ## left align plots if landscape
+    
+    # get max width and reassign to all
+    plots <- lapply(plots, ggplotGrob)
+    widths <- lapply(plots, function(x) x$widths[2:3])
+    maxwidth <- do.call('unit.pmax', widths)
   
-    # sets layout according to specified widths in function arguments
-  lmLayout <- grid.layout(nrow = 1, ncol = length(lwidth), 
-  			widths = unit(lwidth, rep("null", length(lwidth))), 
-  			heights = unit(rep(1, length(lwidth)), rep("null", length(lwidth))))
-  plots$layout <- lmLayout
-  plots$plot.width <- plot.width
-  plots$plot.height <- plot.height
+    for(i in 1:length(plots)) plots[[i]]$widths[2:3] <- maxwidth
   
-  class(plots) <- "mm"
-  
-  if(print.file == "no") print.file <- NULL
-  print(plots, name = print.file, res = print.res)
-  
-    # invisibly return the list of ggplot objects 
-  invisible(plots)
+    # plot
+    grid.arrange(grobs = plots, ncol = 1)
+    
+  } else {
+    
+    # plot
+    grid.arrange(grobs = plots, ncol = length(plots))
+     
+  }
 
 } 
 
 # the printing function
-print.mm <- function(x, name = NULL, res = 300, ...){
+print.mm <- function(x, name = NULL, res = 300, flip, ...){
   plobject <- x
   file.name <- print.file <- name
   recognized.print.type <- FALSE
@@ -513,8 +519,19 @@ print.mm <- function(x, name = NULL, res = 300, ...){
 
 	grid.newpage()
 	pushViewport(viewport(layout = plobject$layout))
-	suppressWarnings(for(p in 1:(length(plobject)-3)) print(plobject[[p]], vp = subplot(1, p*2)))
-	
+  
+	if(flip){
+    suppressWarnings(
+  	  for(p in 1:(length(plobject)-3)) 
+  	    print(plobject[[p]], vp = subplot(p*2, 1))
+  	  )
+	} else {
+	   suppressWarnings(
+  	  for(p in 1:(length(plobject)-3)) 
+  	    print(plobject[[p]], vp = subplot(1, p*2))
+  	  )
+	}
+	  
 	if(recognized.print.type & !is.null(name)) dev.off()
 }
 

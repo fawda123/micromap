@@ -1,4 +1,4 @@
-RankMaps <- function(pl, p, mapDF, att){
+RankMaps <- function(pl, p, mapDF, att, flip){
 	# att=a
 	bgcolor 	<- ifelse(!is.na(att[[p]]$panel.bgcolor), att[[p]]$panel.bgcolor, 'white')
 	outer.hull 	<- att[[p]]$outer.hull		# whether we need to construct an outline of the map poygons
@@ -161,41 +161,56 @@ RankMaps <- function(pl, p, mapDF, att){
 
 	 }
 
-
-
-	#*** draw polygons of current perceptual group																			
+	#*** draw polygons of current perceptual group
 	pl <- pl + 
 		geom_polygon(aes(fill=factor(fill.color)), 
 			colour=att[[p]]$active.border.color, 
 			size=att[[p]]$active.border.size/2, 
 			data=subset(mapDF, hole==0)) + 				
-		facet_grid(pGrp~., space="free") +
 		scale_fill_manual(values=c(att$colors), guide='none') +
 		coord_equal() 
+  
+	# portrait or landscape
+	if(flip) pl <- pl +	facet_grid(.~pGrp, space="free")
+  else pl <- pl +	facet_grid(pGrp~., space="free")
 
-
-	  #################################
-	  #################################
-	  #*** insert white space for median row	
-	  mapDF.median <- data.frame(pGrpOrd=1, pGrp=att$m.pGrp, 
-					rank=(max(mapDF$rank)+1)/2, ID='median', 
-					coordsx=range(mapDF$coordsx)[c(1,1,2,2,1)], 
-					coordsy=c(.5, -.5)[c(1,2,2,1,1)],
+  #################################
+  #################################
+  #*** insert white space for median row	
+  mapDF.median <- data.frame(pGrpOrd=1, pGrp=att$m.pGrp, 
+				rank=(max(mapDF$rank)+1)/2, ID='median', 
+				coordsx=range(mapDF$coordsx)[c(1,1,2,2,1)], 
+				coordsy=c(.5, -.5)[c(1,2,2,1,1)],
 #					textx=median(range(mapDF$coordsx)), texty=median(range(mapDF$coordsy)),	
-					tmp.label=att$median.text.label,
-					textx=median(range(mapDF$coordsx)), texty=0, tmp.label='Median',
-					region=1, poly=1, plug=0, hole=0, IDpoly='median')
-	
-	  if(att$median.row) pl <- pl + 
-			geom_polygon(fill='white', colour='white', data=mapDF.median) + 
-				geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4),
-						colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) +
-				facet_grid(pGrp~., space="free")
+				tmp.label=att$median.text.label,
+				textx=median(range(mapDF$coordsx)), texty=0, tmp.label='Median',
+				region=1, poly=1, plug=0, hole=0, IDpoly='median')
 
-	  #################################
-	  #################################
+  if(att$median.row){ 
 
-	  #*** Throw an outer hull over the outside
+    pl <- pl + geom_polygon(fill='white', colour='white', data=mapDF.median) 
+   
+     #lanscape
+    if(flip)
+      pl <- pl + 
+			geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90,
+					colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) + 
+      facet_grid(.~pGrp, space="free")
+    
+    # or portrait
+    else
+      pl <- pl + 
+			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4),
+					colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) +
+        facet_grid(pGrp~., space="free")
+    
+  
+  }
+
+  #################################
+  #################################
+
+  #*** Throw an outer hull over the outside
 
 	if(outer.hull==TRUE) for(g in nGroups[1]:nGroups[2]) pl <- pl + geom_polygon(fill=NA,	 
 													colour=att[[p]]$outer.hull.color, 
@@ -219,7 +234,7 @@ RankMaps <- function(pl, p, mapDF, att){
 				data=transform(bdrCoords, pGrp=g))
 
 
-	  #*** "house keeping" functions to align all panels and apply the user's graphical specifications\	
+	#*** "house keeping" functions to align all panels and apply the user's graphical specifications\	
 	xstr.title <-  "''"
 
 
@@ -246,8 +261,6 @@ RankMaps <- function(pl, p, mapDF, att){
 		pl <- pl + theme(axis.text.x = element_blank()) +
 				theme(axis.ticks = element_blank()) 
 	 }
-
-
 
 	ystr <- paste("scale_y_continuous('', breaks=NULL, expand=c(0,0))")
 

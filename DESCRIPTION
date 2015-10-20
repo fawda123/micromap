@@ -13,7 +13,7 @@ Authors@R: c(person("Quinn", "Payton", role="aut",
              person("Tom", "Kincaid", role=c("cre", "ctb"),
                     email = "Kincaid.Tom@epa.gov"))
 Depends: R (>= 2.10), maptools, RColorBrewer, rgdal, sp
-Imports: ggplot2, grid
+Imports: ggplot2, grid, gridExtra
 Description: This group of functions simplifies the creation of linked micromap
     plots.
 License: GPL (>= 2)

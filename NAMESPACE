@@ -8,5 +8,6 @@ import(rgdal)
 import(sp)
 import(ggplot2)
 import(grid)
+import(gridExtra)
 
 S3method(print, mm)

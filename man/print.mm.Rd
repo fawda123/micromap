@@ -20,6 +20,9 @@
   \item{res}{
   resolution in dpi.
   }
+  \item{flip}{
+  logical if plot if flipped from portrait to landscape
+  }
   \item{...}{
     Additional arguments.  (Currently ignored.)
   }

@@ -1,4 +1,4 @@
-labels_build <- function(pl, p, DF, att){ 
+labels_build <- function(pl, p, DF, att, flip){ 
 
 	DF$tmp.labels <- DF[,unlist(att[[p]]$panel.data)]
 
@@ -42,22 +42,34 @@ labels_build <- function(pl, p, DF, att){
 
 	  #################################
 	  #################################
-
 		
-	pl <- 
-		ggplot(DF) +
-	     	geom_text(aes(x=0, y=tmp.y, label=tmp.labels, 
+	# flip to landscape
+	if(flip){
+	  
+    pl <- ggplot(DF) +
+    	     	geom_text(aes(x = tmp.y, y = 0, label = tmp.labels, 
+    				hjust=0, vjust=.4), angle = 90,
+    				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
+    	     	facet_grid(.~pGrp, scales="free_x", space="free") +
+        		scale_colour_manual(values=att$colors) 
+    
+    tmp.limsx <-rev(-1 * tmp.limsx)
+    
+	} else {
+	  
+	  pl <- ggplot(DF) +
+	     	geom_text(aes(x = 0, y = tmp.y, label = tmp.labels, 
 				hjust=tmp.adj, vjust=.4), 
 				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
 	     	facet_grid(pGrp~., scales="free_y", space="free") +
     		scale_colour_manual(values=att$colors) 
-
+	  
+	}
+ 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), border=FALSE)
-
+  pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), border=FALSE, flip = flip)
 	pl
-
 
 }
 
@@ -99,8 +111,7 @@ ranks_build <- function(pl, p, DF, att){
 	  #################################
 
 
-	pl <- 
-	 	ggplot(DF) +
+	pl <- ggplot(DF) +
 		geom_text(aes(x=0, y=tmp.y, label=rank, hjust=tmp.adj, vjust=.4), 
 				font=att[[p]]$font, face=att[[p]]$face, size=tmp.tsize) +
      		facet_grid(pGrp~., scales="free_y", space="free") 
@@ -110,6 +121,7 @@ ranks_build <- function(pl, p, DF, att){
 	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy, tmp.median.limsy), border=FALSE)
 
 	pl
+	
 }
 
 
@@ -161,7 +173,7 @@ dot_legend_build <- function(pl, p, DF, att){
 
 
 
-dot_build <- function(pl, p, DF, att){ 
+dot_build <- function(pl, p, DF, att, flip){ 
 	DF$tmp.data <- DF[,unlist(att[[p]]$panel.data)]
 	DF$tmp.data1 <- DF[,unlist(att[[p]]$panel.data)]
 	DF$tmp.data2 <- c(0, DF$tmp.data1[-nrow(DF)])
@@ -196,44 +208,99 @@ dot_build <- function(pl, p, DF, att){
 	pl <- ggplot(DF) 
 
 	if(!any(is.na(att[[p]]$add.line))){
-		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.size)==1) att[[p]]$add.line.size <- rep(att[[p]]$add.line.size[1], length(att[[p]]$add.line))
+	  
+		if(length(att[[p]]$add.line.col)==1) 
+		  att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
+		
+		if(length(att[[p]]$add.line.typ)==1) 
+		  att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
+		
+		if(length(att[[p]]$add.line.size)==1) 
+		  att[[p]]$add.line.size <- rep(att[[p]]$add.line.size[1], length(att[[p]]$add.line))
+		
+	}
 
-		for(j in 1:length(att[[p]]$add.line)) pl <- pl + geom_vline(xintercept = att[[p]]$add.line[j], 
-										data=DF, colour=att[[p]]$add.line.col[j], 
-										linetype=att[[p]]$add.line.typ[j],
-										size=att[[p]]$add.line.size[j])
-	  }
+	# landscape
+  if(flip){
+    
+		if(!any(is.na(att[[p]]$add.line)))
+      for(j in 1:length(att[[p]]$add.line)) 
+    	  pl <- pl + geom_hline(yintercept = att[[p]]$add.line[j], 
+    									data=DF, colour=att[[p]]$add.line.col[j], 
+    									linetype=att[[p]]$add.line.typ[j],
+    									size=att[[p]]$add.line.size[j])
 
-	if(att[[p]]$median.line) pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data = DF, 
-							colour = att[[p]]$median.line.col, 
-							linetype = att[[p]]$median.line.typ, 
-							size = att[[p]]$median.line.size)	
+  	if(att[[p]]$median.line) 
+  	  pl <- pl + geom_hline(aes(yintercept = median(tmp.data)), data = DF, 
+  							colour = att[[p]]$median.line.col, 
+  							linetype = att[[p]]$median.line.typ, 
+  							size = att[[p]]$median.line.size)	
+  
+  	if(att[[p]]$connected.dots) 
+  	  pl <- pl + geom_segment(aes(y = tmp.data1, x = -pGrpOrd,
+  								yend = -tmp.data2, xend = tmp.data3),
+  							data = subset(DF, pGrpOrd>1), 
+  			            			colour = att[[p]]$connected.col,
+  							size = att[[p]]$connected.size, 
+  					            	linetype = att[[p]]$connected.typ)   
+  
+  	if(att[[p]]$point.border) 
+  	  pl <- pl + geom_point(aes(y = tmp.data, x = -pGrpOrd), 
+  									colour='black',
+  									size=att[[p]]$point.size*2.5, 
+  									pch=att[[p]]$point.type)
+  	
+  	pl <- pl + 
+  		geom_point(aes(x = -pGrpOrd, y = tmp.data, colour = factor(color)), 
+  				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
+  	     	facet_grid(.~pGrp, scales="free_x", space="free") +
+  		scale_colour_manual(values=att$colors, guide='none')   
+  	
+  # portrait
+	} else {
+	  
+	  if(!any(is.na(att[[p]]$add.line)))
+  	  for(j in 1:length(att[[p]]$add.line)) 
+  	    pl <- pl + geom_vline(xintercept = att[[p]]$add.line[j], 
+  										data=DF, colour=att[[p]]$add.line.col[j], 
+  										linetype=att[[p]]$add.line.typ[j],
+  										size=att[[p]]$add.line.size[j])
 
-	if(att[[p]]$connected.dots) pl <- pl + geom_segment(aes(x = tmp.data1, y = -pGrpOrd,
-								xend = tmp.data2, yend = -tmp.data3),
-							data = subset(DF, pGrpOrd>1), 
-			            			colour = att[[p]]$connected.col,
-							size = att[[p]]$connected.size, 
-					            	linetype = att[[p]]$connected.typ)   
+  	if(att[[p]]$median.line) 
+  	  pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data = DF, 
+  							colour = att[[p]]$median.line.col, 
+  							linetype = att[[p]]$median.line.typ, 
+  							size = att[[p]]$median.line.size)	
+  
+  	if(att[[p]]$connected.dots) 
+  	  pl <- pl + geom_segment(aes(x = tmp.data1, y = -pGrpOrd,
+  								xend = tmp.data2, yend = -tmp.data3),
+  							data = subset(DF, pGrpOrd>1), 
+  			            			colour = att[[p]]$connected.col,
+  							size = att[[p]]$connected.size, 
+  					            	linetype = att[[p]]$connected.typ)   
+  
+  	if(att[[p]]$point.border) 
+  	  pl <- pl + geom_point(aes(x=tmp.data, y=-pGrpOrd), 
+  									colour='black',
+  									size=att[[p]]$point.size*2.5, 
+  									pch=att[[p]]$point.type)
+  	
+  	
+    pl <- pl + 
+  	  geom_point(aes(x=tmp.data, y=-pGrpOrd, colour=factor(color)), 
+  			size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
+  	  facet_grid(pGrp~., scales="free_y", space="free") +
+  		scale_colour_manual(values=att$colors, guide='none') 
 
-	if(att[[p]]$point.border) pl <- pl + geom_point(aes(x=tmp.data, y=-pGrpOrd), 
-									colour='black',
-									size=att[[p]]$point.size*2.5, 
-									pch=att[[p]]$point.type)
-
-	pl <- pl + 
-		geom_point(aes(x=tmp.data, y=-pGrpOrd, colour=factor(color)), 
-				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-	     	facet_grid(pGrp~., scales="free_y", space="free") +
-		scale_colour_manual(values=att$colors, guide='none') 
+  }
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy))
-
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), flip = flip)
+	
 	pl
+	
 }
 
 
