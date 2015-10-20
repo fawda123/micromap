@@ -8,31 +8,31 @@
 #' @param panel.data a list (of lists) of data to be used with each panel (e.g. list(NA, 'Names', list('lower.bound','estimate','upper.bound')).
 #' @param map.link a vector with the name of the columns from stat.data and map.data, respectively, on which to join.
 #' @param nPanels the number of panels, which is not expected to be set by the user.  The default is the length of panel.types.
-#' @param ord.by The column name from stat.data with which to order the lines of the output graphic for a standard lmPLot or identifier column on which to group the categorized lmPLot.
-#' @param grp.by The column name from stat.data with which to order the lines of the output graphic for a standard lmPLot or identifier column on which to group the categorized lmPLot.
+#' @param ord.by The column name from stat.data with which to order the lines of the output graphic for a standard mmplot or identifier column on which to group the categorized mmplot.
+#' @param grp.by The column name from stat.data with which to order the lines of the output graphic for a standard mmplot or identifier column on which to group the categorized mmplot.
 #' @param rev.ord specifies whether the plot should be displayed in reverse order of the ranking column. The default is FALSE.
-#' @param grouping the number of lines per perceptual group (for the standard lmplot only). Can be a single number to have the same numer in each group or a vector of numbers for unequal groupings.
+#' @param grouping the number of lines per perceptual group (for the standard mmplot only). Can be a single number to have the same numer in each group or a vector of numbers for unequal groupings.
 #' @param median.row specifies whether a median row should be included.  If an odd number of data lines are supplied, a data line itself will be used as the median, otherwise median entries will be calculated from the supplied data. Note that without a median row maps are forced into proper size.
 #' @param vertical.align controls vertical alignment of the median row.
 #' @param median.color specifies color of the median row.
 #' @param median.text.color specifies color of text in the median row.
 #' @param median.text.size specifies size of text in the median row.
 #' @param median.text.label specifies the label for text in the median row.
-#' @param cat category column within stats table for a categorization type lmplot.
-#' @param colors a vector of colors for the perceptual groups.  The default is brewer.pal(max(grouping), 'Spectral') for lmplot and brewer.pal(10, 'Spectral') for lmgroupedplot).  The colors are passed to \code{\link[grDevices]{colorRampPalette}} to create a continuous color vector equal in length to the groupings. 
+#' @param cat category column within stats table for a categorization type mmplot.
+#' @param colors a vector of colors for the perceptual groups.  The default is brewer.pal(max(grouping), 'Spectral') for mmplot and brewer.pal(10, 'Spectral') for mmgroupedplot).  The colors are passed to \code{\link[grDevices]{colorRampPalette}} to create a continuous color vector equal in length to the groupings. 
 #' @param map.color the color to fill in previously displayed polygons.
-#' @param map.all by default, lmplot will only plot the polygons associated with data in the stats table; map.all = TRUE will show all the polygons in the polygon table regardless of whether they are actively referred to.
+#' @param map.all by default, mmplot will only plot the polygons associated with data in the stats table; map.all = TRUE will show all the polygons in the polygon table regardless of whether they are actively referred to.
 #' @param map.color2 the color to fill in previously displayed polygons.
 #' @param two.ended.maps the resulting micromaps will highlight previously referenced polygons (see map.color2) up to the median perceptual group then switch to highlighting all polygons that are still to be referenced later.
-#' @param print.file name of the file being created. The extension (.pdf, .tiff, .jpeg, .png) tells lmplot which image creation tool to use.
+#' @param print.file name of the file being created. The extension (.pdf, .tiff, .jpeg, .png) tells mmplot which image creation tool to use.
 #' @param print.res the resolution of the image to use.
-#' @param panel.att a list of panel specific attributes to be altered (see lmplot documentation).
-#' @param plot.header the overall title to be placed on the lmPLot.
-#' @param plot.header.size size of the overall title to be placed on the lmPLot.
-#' @param plot.header.color color of the overall title to be placed on the lmPLot.
-#' @param plot.footer the overall footer to be placed under the lmPLot.
-#' @param plot.footer.size size of the overall footer to be placed under the lmPLot.
-#' @param plot.footer.color color of the overall footer to be placed under the lmPLot.
+#' @param panel.att a list of panel specific attributes to be altered (see mmplot documentation).
+#' @param plot.header the overall title to be placed on the mmplot.
+#' @param plot.header.size size of the overall title to be placed on the mmplot.
+#' @param plot.header.color color of the overall title to be placed on the mmplot.
+#' @param plot.footer the overall footer to be placed under the mmplot.
+#' @param plot.footer.size size of the overall footer to be placed under the mmplot.
+#' @param plot.footer.color color of the overall footer to be placed under the mmplot.
 #' @param plot.width width of the overall plot in inches. Defaults to 7.
 #' @param plot.height height of the overall plot in inches. Defaults to 7.
 #' @param map.spacing the vertical spacing between maps measured in lines. Perceptual group spacing does not affect map spacing so as to leave the maps as large as possible. The user can increase map spacing using this argument. Defaults to 1.
@@ -51,7 +51,7 @@
 #' 
 #' @keywords hplot
 #' 
-#' @aliases mmplot lmplot mmgroupedplot lmgroupedplot
+#' @aliases mmplot mmgroupedplot
 #' 
 #' @name mmplot
 #' 
@@ -67,7 +67,7 @@
 #' data("edPov")
 #' 
 #' # basic figure 1
-#' lmplot(stat.data = edPov,
+#' mmplot(stat.data = edPov,
 #'   	map.data = statePolys,
 #' 	panel.types = c('labels', 'dot', 'dot','map'),
 #' 	panel.data = list('state','pov','ed', NA),
@@ -76,7 +76,7 @@
 #' 	map.link = c('StateAb','ID'))
 #' 
 #' # publication figure 1a
-#' lmplot(stat.data = edPov,  map.data = statePolys ,
+#' mmplot(stat.data = edPov,  map.data = statePolys ,
 #' 	panel.types = c('labels', 'dot', 'dot','map'),
 #' 	panel.data = list('state','pov','ed', NA),
 #' 	ord.by = 'pov',  
@@ -104,7 +104,7 @@
 #' edPov$points <- 0	
 #' 
 #' # publication figure 1b
-#' lmplot (stat.data = edPov, map.data = statePolys,
+#' mmplot (stat.data = edPov, map.data = statePolys,
 #' 	panel.types = c('dot',  'labels', 'dot', 'dot', 'map'),
 #' 	panel.data = list('points', 'state', 'pov', 'ed', NA),
 #' 	map.link = c('StateAb','ID'),
@@ -140,7 +140,7 @@
 #' 					panel.width = .8)))
 #' 
 #' # publication figure 1c
-#' myPlot <- lmplot(stat.data = edPov, map.data = statePolys,
+#' myPlot <- mmplot(stat.data = edPov, map.data = statePolys,
 #' 	panel.types = c('map', 'dot',  'labels', 'dot', 'dot'),
 #' 	panel.data = list(NA, 'points', 'state', 'pov', 'ed'),
 #' 	map.link = c('StateAb','ID'),
@@ -458,7 +458,7 @@ mmplot.default <- function(map.data,
        
         } else {
   	
-  	  stop(paste("unknown panel type -- '",panel.types[p],"'", sep = ''))		# if no such function exists, lmPlot2 throws in the towel
+  	  stop(paste("unknown panel type -- '",panel.types[p],"'", sep = ''))		# if no such function exists, mmplot2 throws in the towel
   
       }		
   				

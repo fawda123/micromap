@@ -11,18 +11,35 @@ labels_build <- function(pl, p, DF, att, flip){
 			(max(-DF$pGrpOrd)+.5)*att[[p]]$text.size)
 
 	mln <- max(nchar(as.character(DF$tmp.labels)))
+	# sets up text orientation given align and flip args
+	if(flip){
+    
 	  if (att[[p]]$align=='right') {
-			tmp.limsx <- c(-mln,0)
-			DF$tmp.adj <- 1
-	    }
-	  if (att[[p]]$align=='left') {
-			tmp.limsx <- c(0,mln)
-			DF$tmp.adj <- 0
-	    }
-	  if (att[[p]]$align=='center') {
-			tmp.limsx <- c(-mln/2,mln/2)
-			DF$tmp.adj <- .5
-	    }
+  		tmp.limsx <- c(0,mln)
+  		DF$tmp.adj <- 0
+      }
+    if (att[[p]]$align=='left') {
+  		tmp.limsx <- c(-mln,0)
+  		DF$tmp.adj <- 1
+    }
+	  
+	} else {
+	  
+    if (att[[p]]$align=='right') {
+  		tmp.limsx <- c(-mln,0)
+  		DF$tmp.adj <- 1
+      }
+    if (att[[p]]$align=='left') {
+  		tmp.limsx <- c(0,mln)
+  		DF$tmp.adj <- 0
+    }
+	  
+	}
+	
+  if (att[[p]]$align=='center') {
+		tmp.limsx <- c(-mln/2,mln/2)
+		DF$tmp.adj <- .5
+    }
 
 
 	  #################################
@@ -42,19 +59,18 @@ labels_build <- function(pl, p, DF, att, flip){
 
 	  #################################
 	  #################################
-		
+
+	
 	# flip to landscape
 	if(flip){
 	  
     pl <- ggplot(DF) +
     	     	geom_text(aes(x = tmp.y, y = 0, label = tmp.labels, 
-    				hjust=0, vjust=.4), angle = 90,
+    				hjust=tmp.adj, vjust=.4), angle = 90,
     				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
     	     	facet_grid(.~pGrp, scales="free_x", space="free") +
         		scale_colour_manual(values=att$colors) 
-    
-    tmp.limsx <-rev(-1 * tmp.limsx)
-    
+  
 	} else {
 	  
 	  pl <- ggplot(DF) +
@@ -65,7 +81,7 @@ labels_build <- function(pl, p, DF, att, flip){
     		scale_colour_manual(values=att$colors) 
 	  
 	}
- 
+
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
   pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), border=FALSE, flip = flip)

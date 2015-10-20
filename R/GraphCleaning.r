@@ -82,7 +82,7 @@ graph_opts <- function(i, pl, a){
 axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, flip){
 
 	# i=p; a=att; limsx=tmp.limsx; limsy=c(tmp.limsy,tmp.median.limsy); border=FALSE; expx=FALSE
-  
+
 	# many features are "hidden" by simply coloring the same color as the background so
 	#   if panel background is NA we assume "white" will effectively do the hiding
   bgcolor <- ifelse(!is.na(a[[i]]$panel.bgcolor), a[[i]]$panel.bgcolor, 'white')

@@ -12,7 +12,7 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 
 	#*** store all the polygon data then subset only those with data
 	mapDF.all <- mapDF				
-        mapDF <- subset(mapDF.all, !is.na(rank))	
+  mapDF <- subset(mapDF.all, !is.na(rank))	
 
 	#*** here we build the "outer hull" (polygon outline) if neccesary
 	if(outer.hull==TRUE){

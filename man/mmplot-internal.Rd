@@ -1,4 +1,4 @@
-\name{lmplot-internal}
+\name{mmplot-internal}
 \alias{all_atts}
 \alias{all_attsb}
 \alias{all_equal2}
@@ -14,9 +14,9 @@
 \alias{plot_opts}
 \alias{RankMaps}
 \alias{subplot}
-\title{Internal lmplot Functions}
+\title{Internal mmplot Functions}
 \description{
-  These functions are internal lmplot functions.
+  These functions are internal mmplot functions.
 }
 \usage{
 all_atts(a, att.name)
