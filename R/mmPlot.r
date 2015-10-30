@@ -482,12 +482,12 @@ mmplot.default <- function(map.data,
     for(i in 1:length(plots)) plots[[i]]$widths[2:3] <- maxwidth
   
     # plot
-    grid.arrange(grobs = plots, ncol = 1)
+    grid.arrange(grobs = plots, ncol = 1, newpage = F)
     
   } else {
     
     # plot
-    grid.arrange(grobs = plots, ncol = length(plots))
+    grid.arrange(grobs = plots, ncol = length(plots), newpage = F)
      
   }
 
