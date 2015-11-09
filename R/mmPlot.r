@@ -213,7 +213,7 @@ mmplot.default <- function(map.data,
   median.text.color = 'black',
   median.text.size = 1,
   median.text.label = 'Median',
-  colors = brewer.pal(max(grouping), "Spectral"),	
+  colors = brewer.pal(11, "Spectral"),	
   map.all = FALSE, 
   map.color2 = 'lightgray',
   two.ended.maps = FALSE,
@@ -237,7 +237,7 @@ mmplot.default <- function(map.data,
   # rename function inputs
   dStats <- stat.data
   dMap <- map.data
-  
+
   # get plot colors, add median if supplied
   colors = colorRampPalette(colors)(grouping)
   if(median.row) colors <- c(colors, median.color) 
