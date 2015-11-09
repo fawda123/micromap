@@ -1,4 +1,4 @@
-labels_build <- function(pl, p, DF, att, flip){ 
+labels_build <- function(pl, p, DF, att, flip = FALSE){ 
 
 	DF$tmp.labels <- DF[,unlist(att[[p]]$panel.data)]
 

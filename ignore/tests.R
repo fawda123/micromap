@@ -50,6 +50,7 @@ poly=region*1000 + poly)
 wsa.polys<-rbind(wsa.polys,national.polys)
 data("vegCov")
 
+# colors are screwed up?
 mmgroupedplot(stat.data=vegCov,
   map.data=wsa.polys,
   panel.types=c("map", "labels", "bar_cl", "bar_cl"),
@@ -58,6 +59,5 @@ mmgroupedplot(stat.data=vegCov,
   list("Estimate.U","LCB95Pct.U","UCB95Pct.U")),
   grp.by="Subpopulation",
   cat="Category",
-  map.link=c("Subpopulation", "ID"),
-  flip = F
+  map.link=c("Subpopulation", "ID")
   )

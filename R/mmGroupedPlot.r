@@ -210,11 +210,12 @@ for(p in 1:nPanels){
 
 	plots[[p]]  <- CatMaps(plots[[p]], p, mapDF, a) 
   
-  } else if(exists(as.character(paste(panel.types[p],'_build',sep='')))) {					# all graph types should have a function by the 
-												# same name. First we check to see if such a function does
-												# in fact exist, if so we use "eval(parse(..." to call it
+  } else if(exists(as.character(paste(panel.types[p],'_build',sep='')))) {					
+    # all graph types should have a function by the 
+		# same name. First we check to see if such a function does
+		# in fact exist, if so we use "eval(parse(..." to call it
+    
 	plots[[p]] <- eval(parse(text=paste(panel.types[p],'_build(plots[[p]], p, DF, a)',sep='')))
-
 
   } else {
 
@@ -243,13 +244,10 @@ plots$layout <- lmLayout
 plots$plot.width <- plot.width
 plots$plot.height <- plot.height
 
-
-class(plots) <- "mm"
-
-plots
-
-invisible(plots)
-
+# plot
+toplo <- lapply(plots, inherits, 'ggplot')
+plots <- lapply(plots[unlist(toplo)], ggplotGrob)
+grid.arrange(grobs = plots, ncol = length(plots), newpage = F)
 
 }   ###### END FUNCTION ######
 

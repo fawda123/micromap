@@ -79,7 +79,7 @@ graph_opts <- function(i, pl, a){
 
 
 ### sets graph boundaries, ticks, labels, borders
-axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, flip){
+axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, flip = FALSE){
 
 	# i=p; a=att; limsx=tmp.limsx; limsy=c(tmp.limsy,tmp.median.limsy); border=FALSE; expx=FALSE
 

@@ -467,7 +467,7 @@ mmplot.default <- function(map.data,
   ##############################
 
   if(flip){
-      
+
     ## left align plots if landscape
     
     # get max width and reassign to all
