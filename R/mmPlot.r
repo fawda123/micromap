@@ -24,8 +24,6 @@
 #' @param map.all by default, mmplot will only plot the polygons associated with data in the stats table; map.all = TRUE will show all the polygons in the polygon table regardless of whether they are actively referred to.
 #' @param map.color2 the color to fill in previously displayed polygons.
 #' @param two.ended.maps the resulting micromaps will highlight previously referenced polygons (see map.color2) up to the median perceptual group then switch to highlighting all polygons that are still to be referenced later.
-#' @param print.file name of the file being created. The extension (.pdf, .tiff, .jpeg, .png) tells mmplot which image creation tool to use.
-#' @param print.res the resolution of the image to use.
 #' @param panel.att a list of panel specific attributes to be altered (see mmplot documentation).
 #' @param plot.header the overall title to be placed on the mmplot.
 #' @param plot.header.size size of the overall title to be placed on the mmplot.
@@ -140,7 +138,7 @@
 #' 					panel.width = .8)))
 #' 
 #' # publication figure 1c
-#' myPlot <- mmplot(stat.data = edPov, map.data = statePolys,
+#' mmplot(stat.data = edPov, map.data = statePolys,
 #' 	panel.types = c('map', 'dot',  'labels', 'dot', 'dot'),
 #' 	panel.data = list(NA, 'points', 'state', 'pov', 'ed'),
 #' 	map.link = c('StateAb','ID'),
@@ -175,7 +173,6 @@
 #' 				inactive.border.color = gray(.7), inactive.border.size = 2, 
 #' 				panel.width = .8)))
 #' 
-#' print(myPlot, name = 'myExhibit.tiff', res = 300)
 #' }
 mmplot <- function(map.data, ...) UseMethod('mmplot')
 
@@ -217,7 +214,6 @@ mmplot.default <- function(map.data,
   map.all = FALSE, 
   map.color2 = 'lightgray',
   two.ended.maps = FALSE,
-  print.file = 'no', print.res = 300,
   panel.att = vector("list", nPanels),
   plot.header = NA,
   plot.header.size = NA,
@@ -492,46 +488,4 @@ mmplot.default <- function(map.data,
   }
 
 } 
-
-# the printing function
-print.mm <- function(x, name = NULL, res = 300, flip, ...){
-  plobject <- x
-  file.name <- print.file <- name
-  recognized.print.type <- FALSE
-  if(!is.null(name)) recognized.print.type <- right(print.file,3) %in% right(c('.pdf','.tiff','.tif','.jpeg','.jpg','.png','.ps'),3)
-
-#   if(!recognized.print.type) {
-#     if(.Platform$OS.type = =  "windows") options(device = "windows")
-#     dev.new(width = plobject$plot.width, height = plobject$plot.height)
-#   }
-
-  if(!is.null(name)){
-	if(right(print.file,4) == '.pdf') 	pdf(print.file, width = plobject$plot.width, height = plobject$plot.height)
-	if(right(print.file,5) == '.tiff') 	tiff(print.file, width = plobject$plot.width, height = plobject$plot.height, units = 'in', res = res)
-	if(right(print.file,4) == '.tif') 	tiff(print.file, width = plobject$plot.width, height = plobject$plot.height, units = 'in', res = res)
-	if(right(print.file,5) == '.jpeg') 	jpeg(print.file, width = plobject$plot.width, height = plobject$plot.height, units = 'in', res = res)
-	if(right(print.file,4) == '.jpg') 	jpeg(print.file, width = plobject$plot.width, height = plobject$plot.height, units = 'in', res = res)
-	if(right(print.file,4) == '.png') 	png(print.file, width = plobject$plot.width, height = plobject$plot.height, units = 'in', res = res)
-	if(right(print.file,3) == '.ps') 		postscript(print.file, width = plobject$plot.width, height = plobject$plot.height)
-
-	if(!recognized.print.type) print("Warning: printing file type not recognized")
-  }
-
-	grid.newpage()
-	pushViewport(viewport(layout = plobject$layout))
-  
-	if(flip){
-    suppressWarnings(
-  	  for(p in 1:(length(plobject)-3)) 
-  	    print(plobject[[p]], vp = subplot(p*2, 1))
-  	  )
-	} else {
-	   suppressWarnings(
-  	  for(p in 1:(length(plobject)-3)) 
-  	    print(plobject[[p]], vp = subplot(1, p*2))
-  	  )
-	}
-	  
-	if(recognized.print.type & !is.null(name)) dev.off()
-}
 

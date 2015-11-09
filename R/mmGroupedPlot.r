@@ -18,8 +18,6 @@ mmgroupedplot <- function(stat.data, map.data, 		# Required -- statistical data;
   map.color='lightyellow',
   map.all=FALSE,	
 
-  print.file='no', print.res=NA,
-
   panel.att=vector("list", nPanels),
 
   ### Options for entire linked micromap plot ###
@@ -248,9 +246,7 @@ plots$plot.height <- plot.height
 
 class(plots) <- "mm"
 
-if(print.file=="no") print.file <- NULL
-print(plots, name=print.file, res=print.res)
-
+plots
 
 invisible(plots)
 

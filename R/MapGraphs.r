@@ -170,22 +170,10 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 		scale_fill_manual(values=c(att$colors), guide='none')
   
 	# portrait or landscape
-  # axes are fixed if no median, otherwise free
-	if(flip){ 
-    if(att$median.row){
-      warning('Aspect ratio of maps not 1:1 if median row is present')
-      pl <- pl +	facet_grid(.~pGrp, scales = 'free', space = 'free') 
-    } else { 
-      pl <- pl + facet_grid(.~pGrp) + coord_fixed()
-    }
-	} else {
-    if(att$median.row){
-      warning('Aspect ratio of maps not 1:1 if median row is present')
-      pl <- pl +	facet_grid(pGrp~., scales = 'free', space = 'free')
-    } else { 
-      pl <- pl + facet_grid(pGrp~.) + coord_fixed()
-    }
-	}
+	if(flip)
+    pl <- pl + facet_grid(.~pGrp) + coord_fixed()  
+	else 
+    pl <- pl + facet_grid(pGrp~.) + coord_fixed()
 
   #################################
   #################################
@@ -198,20 +186,22 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 				tmp.label=att$median.text.label,
 				textx=median(range(mapDF$coordsx)), texty=0, tmp.label='Median',
 				region=1, poly=1, plug=0, hole=0, IDpoly='median')
-
+  
   if(att$median.row){ 
-
-    pl <- pl + geom_polygon(fill='white', colour='white', data=mapDF.median) 
-   
+    
+    warning('Aspect ratio of maps not 1:1 if median row is present')
+    
     #landscape
     if(flip)
       pl <- pl + 
-			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90, colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median)
+			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90, colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) + 
+      facet_grid(.~pGrp, scales = 'free', space = 'free') 
     
     # or portrait
     else
       pl <- pl + 
-			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) 
+			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) +
+      facet_grid(pGrp~., scales = 'free', space = 'free')
   
   }
 
