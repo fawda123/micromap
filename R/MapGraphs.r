@@ -167,12 +167,25 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 			colour=att[[p]]$active.border.color, 
 			size=att[[p]]$active.border.size/2, 
 			data=subset(mapDF, hole==0)) + 				
-		scale_fill_manual(values=c(att$colors), guide='none') +
-		coord_equal() 
+		scale_fill_manual(values=c(att$colors), guide='none')
   
 	# portrait or landscape
-	if(flip) pl <- pl +	facet_grid(.~pGrp, space="free")
-  else pl <- pl +	facet_grid(pGrp~., space="free")
+  # axes are fixed if no median, otherwise free
+	if(flip){ 
+    if(att$median.row){
+      warning('Aspect ratio of maps not 1:1 if median row is present')
+      pl <- pl +	facet_grid(.~pGrp, scales = 'free', space = 'free') 
+    } else { 
+      pl <- pl + facet_grid(.~pGrp) + coord_fixed()
+    }
+	} else {
+    if(att$median.row){
+      warning('Aspect ratio of maps not 1:1 if median row is present')
+      pl <- pl +	facet_grid(pGrp~., scales = 'free', space = 'free')
+    } else { 
+      pl <- pl + facet_grid(pGrp~.) + coord_fixed()
+    }
+	}
 
   #################################
   #################################
@@ -190,20 +203,15 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 
     pl <- pl + geom_polygon(fill='white', colour='white', data=mapDF.median) 
    
-     #lanscape
+    #landscape
     if(flip)
       pl <- pl + 
-			geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90,
-					colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) + 
-      facet_grid(.~pGrp, space="free")
+			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90, colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median)
     
     # or portrait
     else
       pl <- pl + 
-			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4),
-					colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) +
-        facet_grid(pGrp~., space="free")
-    
+			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) 
   
   }
 
