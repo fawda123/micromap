@@ -441,25 +441,30 @@ mmplot.default <- function(map.data,
   # each section builds a plot object of the specified type
   for(p in 1:nPanels){	
   
-      if(panel.types[p] == 'map'){
+    # maps
+    if(panel.types[p] == 'map'){
+
+	    plots[[p]]  <- RankMaps(plots[[p]], p, mapDF, a, flip = flip)
+
+    } 
   
-  	  plots[[p]]  <- RankMaps(plots[[p]], p, mapDF, a, flip = flip)
+    # labels
+    if(panel.types[p] == 'labels'){
+      
+      plots[[p]] <- eval(parse(text = paste(panel.types[p], '_build(plots[[p]], p, DF, a, flip = flip)',sep = '')))
+      
+    }
   
-  
-        } else if(exists(as.character(paste(panel.types[p],'_build',sep = '')))) {	# all graph types should have a function by the 
-  														# same name. first we check to see if such a function does
-  														# in fact exist, if so we use "eval(parse(..." to call it
-  
-  	  plots[[p]] <- eval(parse(text = paste(panel.types[p],'_build(plots[[p]], p, DF, a, flip = flip)',sep = '')))
-       
-        } else {
-  	
-  	  stop(paste("unknown panel type -- '",panel.types[p],"'", sep = ''))		# if no such function exists, mmplot2 throws in the towel
-  
-      }		
-  				
-       # reset DF table (delete added tmp.data columns and what not)
-      DF <- DF.hold	
+    # other
+    if(!panel.types[p] %in% c('map', 'labels')){
+
+	    plots[[p]] <- eval(parse(text = paste('pan_build(plots[[p]], p, "', panel.types[p], '", DF, a, flip = flip)',sep = '')))
+     
+    }		
+				
+    # reset DF table (delete added tmp.data columns and what not)
+    DF <- DF.hold	
+      
   }
   
   ##############################
@@ -469,7 +474,7 @@ mmplot.default <- function(map.data,
   if(flip){
 
     ## left align plots if landscape
-    
+
     # get max width and reassign to all
     plots <- lapply(plots, ggplotGrob)
     widths <- lapply(plots, function(x) x$widths[2:3])
@@ -478,12 +483,12 @@ mmplot.default <- function(map.data,
     for(i in 1:length(plots)) plots[[i]]$widths[2:3] <- maxwidth
   
     # plot
-    grid.arrange(grobs = plots, ncol = 1, newpage = F)
+    grid.arrange(grobs = plots, ncol = 1)
     
   } else {
     
     # plot
-    grid.arrange(grobs = plots, ncol = length(plots), newpage = F)
+    grid.arrange(grobs = plots, ncol = length(plots))
      
   }
 

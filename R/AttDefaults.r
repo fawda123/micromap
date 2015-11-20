@@ -139,6 +139,8 @@ dot_att <- function(show=FALSE) {
   if(show) tmp.att else invisible(tmp.att)
  }
 
+#*** generic panel attribute list, same as dot ***#
+pan_att <- dot_att
 
 #*** dot.cl ***#
 dot_cl_att <- function(show=FALSE) {

@@ -274,23 +274,21 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 
 }
 
-
-CatMaps <- function(pl, p, mapDF, att){
+CatMaps <- function(pl, p, mapDF, att, flip){
 	bgcolor <- ifelse(!is.na(att[[p]]$panel.bgcolor), att[[p]]$panel.bgcolor, 'white')
 
 	mapDF.all <- mapDF
 	mapDF <- subset(mapDF, !is.na(pGrp))
 
-	pl <-  
-		ggplot(mapDF, aes(x=coordsx, y=coordsy, group=poly)) +  
+	pl <- ggplot(mapDF, aes(x=coordsx, y=coordsy, group=poly)) +  
 		geom_polygon(fill='white', colour='black', data=transform(mapDF.all, pGrp=NULL)) + 	
 		geom_polygon(fill=att$map.color, colour='black', data=subset(mapDF, hole==0)) + 				
 		geom_polygon(fill='white', colour='black', data=subset(mapDF, hole==1)) +
 		geom_polygon(fill='transparent', colour='black', data=subset(transform(mapDF, pGrp=NULL), hole==1)) +
-		facet_grid(pGrp~., space="free") +
-		coord_equal() 
-
-
+		coord_equal()
+	
+	if(flip) pl <- pl + facet_grid(.~pGrp, space="free") 
+	else pl <- pl + facet_grid(pGrp~., space="free") 
 
 	#*** Creates backgroupnd points to correctly align perceptual groups 		
 	bdrCoordsy <- att[[p]]$bdrCoordsy

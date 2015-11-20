@@ -14,7 +14,7 @@ mmgroupedplot <- function(stat.data, map.data, 		# Required -- statistical data;
   grp.by, cat,						# Required	-- specifies which column in dStats by which to rank and order the output;
 								# 	specifies the perceptual groups (e.g. "c(5,5,5,5,2)" to have 4 gorups of 5 followed 
 								# 	by a single group of 2			
-  colors=brewer.pal(10, "Spectral"),	
+  colors=brewer.pal(11, "Spectral"),	
   map.color='lightyellow',
   map.all=FALSE,	
 
@@ -34,7 +34,8 @@ mmgroupedplot <- function(stat.data, map.data, 		# Required -- statistical data;
   map.spacing=1,
   plot.grp.spacing=1,
   plot.panel.spacing=1,
-  plot.panel.margins=c(0,0,1,0)
+  plot.panel.margins=c(0,0,1,0), 
+  flip = FALSE
 ){					### end function arguments list
 
   # rename function inputs (for ease in coding)
@@ -198,8 +199,6 @@ if(any(panel.types=='map')){
 # *** note: each panel in the plot is a "plot object" 
 plots <- vector("list", nPanels)
 
-
-
 ###############################
 ##### create plot objects #####
 ###############################
@@ -208,7 +207,7 @@ for(p in 1:nPanels){
 
   if (panel.types[p]=='map'){
 
-	plots[[p]]  <- CatMaps(plots[[p]], p, mapDF, a) 
+	plots[[p]]  <- CatMaps(plots[[p]], p, mapDF, a, flip = flip) 
   
   } else if(exists(as.character(paste(panel.types[p],'_build',sep='')))) {					
     # all graph types should have a function by the 
@@ -247,7 +246,7 @@ plots$plot.height <- plot.height
 # plot
 toplo <- lapply(plots, inherits, 'ggplot')
 plots <- lapply(plots[unlist(toplo)], ggplotGrob)
-grid.arrange(grobs = plots, ncol = length(plots), newpage = F)
+grid.arrange(grobs = plots, ncol = length(plots))
 
 }   ###### END FUNCTION ######
 

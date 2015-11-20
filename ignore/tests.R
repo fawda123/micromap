@@ -30,13 +30,23 @@ mmplot(stat.data=edPov, map.data=statePolys,
 )
 
 ## 
-# problem...
+# problem... not a micromap issue
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=17,
   map.link=c("StateAb","ID"),
   flip = T
+)
+
+##
+# test different panel types
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "pan","dot", "map"),
+  panel.data=list("state","pov","ed", NA),
+  ord.by="pov", grouping=5,
+  median.row = T, 
+  map.link=c("StateAb","ID")
 )
 
 ##
@@ -50,7 +60,7 @@ poly=region*1000 + poly)
 wsa.polys<-rbind(wsa.polys,national.polys)
 data("vegCov")
 
-# colors are screwed up?
+# standard plot, ok
 mmgroupedplot(stat.data=vegCov,
   map.data=wsa.polys,
   panel.types=c("map", "labels", "bar_cl", "bar_cl"),
@@ -61,3 +71,30 @@ mmgroupedplot(stat.data=vegCov,
   cat="Category",
   map.link=c("Subpopulation", "ID")
   )
+
+# standard plot, ok
+mmgroupedplot(stat.data=vegCov,
+  map.data=wsa.polys,
+  panel.types=c("map", "labels", "dot", "bar_cl"),
+  panel.data=list(NA,"Category",
+  list("Estimate.P","LCB95Pct.P","UCB95Pct.P"),
+  list("Estimate.U","LCB95Pct.U","UCB95Pct.U")),
+  grp.by="Subpopulation",
+  cat="Category",
+  map.link=c("Subpopulation", "ID"),
+  flip = F
+  )
+
+
+# ok
+mmgroupedplot(stat.data=vegCov,
+  map.data=wsa.polys,
+  panel.types=c("map", "labels", "bar_cl", "bar_cl"),
+  panel.data=list(NA,"Category",
+  list("Estimate.P","LCB95Pct.P","UCB95Pct.P"),
+  list("Estimate.U","LCB95Pct.U","UCB95Pct.U")),
+  grp.by="Subpopulation",
+  cat="Category",
+  map.link=c("Subpopulation", "ID")
+  )
+
