@@ -29,7 +29,7 @@ create_map_table <- function (tmp.map, IDcolumn = NA, poly.thresh=.0001)
         tmp.map@data$ID <- tmp.map@data[, IDcolumn]
     }
     else {
-        if (is.null(tmp.map@data$ID))  stop("\n ! No ID column exists\n ! No column has been specified as a unique polygon ID\n ! Create.map.table is confused and offended")
+        if (is.null(tmp.map@data$ID))  stop("\n ! No ID column exists\n ! No column has been specified as a unique polygon ID\n")
     }
 
 

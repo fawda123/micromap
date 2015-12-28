@@ -6,7 +6,7 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
 	 #** width of the panel, whiel maximizing text height as well
 	 #** With the way the defaults are set up. default text size needs to be doubled
 	tmp.tsize <- att[[p]]$text.size*4
-	DF$tmp.y <- -DF$pGrpOrd*att[[p]]$text.size
+	DF$tmp.y <- DF$pGrpOrd*att[[p]]$text.size
 	tmp.limsy <- c((min(-DF$pGrpOrd)-.5)*att[[p]]$text.size, 
 			(max(-DF$pGrpOrd)+.5)*att[[p]]$text.size)
 
@@ -41,26 +41,9 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
 		DF$tmp.adj <- .5
     }
 
-
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=1, pGrp=att$m.pGrp, median=TRUE, 
-							rank='', tmp.y=-att[[p]]$text.size,
-							tmp.labels=''))
-
-
-	    tmp.median.limsy <- att[[p]]$text.size*c(-1.5,-.5)
-	  }
-
-
 	  #################################
 	  #################################
 
-	
 	# flip to landscape
 	if(flip){
 	  
@@ -68,23 +51,23 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
     	     	geom_text(aes(x = tmp.y, y = 0, label = tmp.labels, 
     				hjust=tmp.adj, vjust=.4), angle = 90,
     				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
-    	     	facet_grid(.~pGrp, scales="free_x", space="free") +
+    	     	facet_grid(.~pGrp, scales="free_x") +
         		scale_colour_manual(values=att$colors) 
   
 	} else {
 	  
 	  pl <- ggplot(DF) +
-	     	geom_text(aes(x = 0, y = tmp.y, label = tmp.labels, 
+	     	geom_text(aes(x = 0, y = -tmp.y, label = tmp.labels, 
 				hjust=tmp.adj, vjust=.4), 
 				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
-	     	facet_grid(pGrp~., scales="free_y", space="free") +
+	     	facet_grid(pGrp~., scales="free_y") +
     		scale_colour_manual(values=att$colors) 
 	  
 	}
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-  pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), border=FALSE, flip = flip)
+  pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, border=FALSE, flip = flip)
 	pl
 
 }
@@ -109,19 +92,6 @@ ranks_build <- function(pl, p, DF, att, flip = FALSE){
 			tmp.limsx <- c(-mln/2,mln/2)
 			DF$tmp.adj <- .5
 	    }
-
-	  #################################
-	  #################################
-	  #*** insert space for median row
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=1, pGrp=att$m.pGrp, median=TRUE, 
-							rank='', tmp.y=-att[[p]]$text.size))
-
-
-	    tmp.median.limsy <- att[[p]]$text.size*c(-1.5,-.5)
-	  }
 	
 	  #################################
 	  #################################
@@ -134,7 +104,7 @@ ranks_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy, tmp.median.limsy), border=FALSE)
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, border=FALSE)
 
 	pl
 	
@@ -149,19 +119,6 @@ dot_legend_build <- function(pl, p, DF, att, flip = FALSE){
 	tmp.limsx <- c(-.5,.5)
 
 	ncolors <- length(att$colors)
-
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=1, pGrp=att$m.pGrp, median=TRUE, 
-							rank='', tmp.data=0))
-
-	    DF$color[DF$median] <- ncolors
-	    tmp.median.limsy <- c(-.5, -1.5)
-	  }
 
 	  #################################
 	  #################################
@@ -182,7 +139,7 @@ dot_legend_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy))
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy)
 
 	pl
 }
@@ -205,19 +162,6 @@ pan_build <- function(pl, p, ptype, DF, att, flip = FALSE){
 	tmp.limsx <- tmp.limsx + c(-1,1) * diff(tmp.limsx)*.05
 	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
 	if(diff(tmp.limsx)==0) tmp.limsx <- tmp.limsx + c(-.5,.5)
-
-	# padding for median row
-  tmp.median.limsy <- NULL
-  if(att$median.row) {
-    
-    if(!any(DF$median)) 
-      DF <- rbind(DF, transform(DF[1,], pGrpOrd=1, pGrp=att$m.pGrp, median=TRUE, 
-						rank=''))
-
-    DF$color[DF$median] <-length(att$colors)
-    tmp.median.limsy <- c(-.5, -1.5)
-    
-  }
   
   # make plot
   pl <- eval(parse(text = paste(ptype, '_build(toplo, p, att, flip = flip)',sep = '')))
@@ -225,7 +169,7 @@ pan_build <- function(pl, p, ptype, DF, att, flip = FALSE){
   # pass to axis_opts, etc.
   pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), flip = flip)
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
 	
 	return(pl) 
 	
@@ -235,13 +179,13 @@ dot_build <- function(pl, p, att, flip = FALSE){
  
   # make plot
   pl <- ggplot(pl)
-  
+
   if(flip){
     
     pl <- pl + 
-  		geom_point(aes(x = -pGrpOrd, y = xvar, colour = factor(color)), 
+  		geom_point(aes(x = pGrpOrd, y = xvar, colour = factor(color)), 
   				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-  	  facet_grid(.~pGrp, scales="free_x", space="free") +
+  	  facet_grid(.~pGrp) + #, scales="free_x", space="free") +
   		scale_colour_manual(values=att$colors, guide='none')   
     
   } else {
@@ -249,7 +193,7 @@ dot_build <- function(pl, p, att, flip = FALSE){
     pl <- pl +   
       geom_point(aes(x=xvar, y=-pGrpOrd, colour=factor(color)), 
   				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-  	  facet_grid(pGrp~., scales="free_y", space="free") +
+  	  facet_grid(pGrp~.) + #, scales="free_y", space="free") +
   		scale_colour_manual(values=att$colors, guide='none') 
     
   }
@@ -258,6 +202,33 @@ dot_build <- function(pl, p, att, flip = FALSE){
 	
 }
 
+
+bar_build <- function(pl, p, att, flip = FALSE){ 
+  
+  # browser()
+  # make plot
+  pl <- ggplot(pl)
+  
+  if(flip){
+    
+    pl <- pl + 
+  		geom_bar(aes(x = pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') +
+  	  facet_grid(.~pGrp, scales="free_x", space="free") +
+  		scale_fill_manual(values=att$colors, guide='none')   
+    
+  } else {
+    
+    pl <- pl +   
+      geom_bar(aes(x = -pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') + 
+  	  coord_flip() + 
+      facet_grid(pGrp~., scales="free_x", space="free") +
+  		scale_fill_manual(values=att$colors, guide='none') 
+    
+  }
+  
+  return(pl)
+
+}
 
 
 
@@ -276,21 +247,6 @@ dot_cl_build <- function(pl, p, DF, att, flip = FALSE){
 
 
 	ncolors <- length(att$colors)
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=ncolors+1, pGrp=att$m.pGrp, median=TRUE, rank='', 
-								tmp.data1=median(DF$tmp.data1),
-								tmp.data2=median(DF$tmp.data2),
-								tmp.data3=median(DF$tmp.data3)))
-	
-	 
-	    DF$color[DF$median] <- ncolors
-	    tmp.median.limsy <- c(-.5, -1.5)
-	  }
 
 	  #################################
 	  #################################
@@ -298,12 +254,6 @@ dot_cl_build <- function(pl, p, DF, att, flip = FALSE){
 	pl <- ggplot(DF) +
 		geom_segment(aes(x=tmp.data2, y=-pGrpOrd, xend=tmp.data3, yend=-pGrpOrd, 
 				colour=factor(color)), size=att[[p]]$line.width) 
-
-
-	if(att[[p]]$median.line) pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data=DF, 
-							colour=att[[p]]$median.line.col, 
-							linetype = att[[p]]$median.line.typ, 
-							size = att[[p]]$median.line.size)
 
 	if(!any(is.na(att[[p]]$add.line))){
 		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
@@ -337,75 +287,12 @@ dot_cl_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), flip = flip)
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
 	
 	pl
 	
 }
 
-
-
-bar_build <- function(pl, p, DF, att, flip = FALSE){ 
-	DF$tmp.data <- DF[,unlist(att[[p]]$panel.data)]
-	DF$tmp.adj <- att[[p]]$graph.bar.size
-
-	tmp.limsx <- range(c(0, DF[,unlist(att[[p]]$panel.data)], na.rm=T))
-	if(any(!is.na(att[[p]]$xaxis.ticks))) tmp.limsx <- range(c(tmp.limsx, att[[p]]$xaxis.ticks))
-	tmp.limsx <- tmp.limsx + c(-.001,.05) * diff(tmp.limsx)
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-
-
-	ncolors <- length(att$colors)
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=ncolors+1, pGrp=att$m.pGrp, median=TRUE, rank='', 
-								tmp.data=median(DF$tmp.data)))
-	
-	 
-	    DF$color[DF$median] <- ncolors
-	    tmp.median.limsy <- c(-.5, -1.5)
-	  }
-
-	  #################################
-	  #################################
-
-	pl  <- 
-		ggplot(DF) +
-		geom_rect(aes(xmin=0, ymin=-pGrpOrd-(tmp.adj/2), 
-				xmax=tmp.data, ymax=-pGrpOrd+(tmp.adj/2), 
-				fill=factor(color), colour='black')) +
-		scale_colour_manual(values='black', guide='none') +
-		scale_fill_manual(values=att$colors, guide='none') +
-	     	facet_grid(pGrp~., scales="free_y", space="free")
-
-
-	if(att[[p]]$median.line) pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data=DF, 
-							colour=att[[p]]$median.line.col, 
-							linetype = att[[p]]$median.line.typ, 
-							size = att[[p]]$median.line.size)
-
-	if(!any(is.na(att[[p]]$add.line))){
-		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.size)==1) att[[p]]$add.line.size <- rep(att[[p]]$add.line.size[1], length(att[[p]]$add.line))
-
-		for(j in 1:length(att[[p]]$add.line)) pl <- pl + geom_vline(xintercept = att[[p]]$add.line[j], 
-										data=DF, colour=att[[p]]$add.line.col[j], 
-										linetype=att[[p]]$add.line.typ[j],
-										size=att[[p]]$add.line.size[j])
-	  }
-
-
-	pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy, tmp.median.limsy), expx=FALSE, flip = flip)
-
-	pl
-}
 
 
 
@@ -423,21 +310,6 @@ bar_cl_build <- function(pl, p, DF, att, flip = FALSE){
 
 
 	ncolors <- length(att$colors)
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=ncolors+1, pGrp=att$m.pGrp, median=TRUE, rank='', 
-								tmp.data1=median(DF$tmp.data1),
-								tmp.data2=median(DF$tmp.data2),
-								tmp.data3=median(DF$tmp.data3)))
-	
-	 
-	    DF$color[DF$median] <- ncolors
-	    tmp.median.limsy <- c(-.5, -1.5)
-	  }
 
 	  #################################
 	  #################################
@@ -453,12 +325,6 @@ bar_cl_build <- function(pl, p, DF, att, flip = FALSE){
 		scale_colour_manual(values='black', guide='none') +
 		scale_fill_manual(values=att$colors, guide='none')
 
-
-	if(att[[p]]$median.line) pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data=DF, 
-							colour=att[[p]]$median.line.col, 
-							linetype = att[[p]]$median.line.typ, 
-							size = att[[p]]$median.line.size)
-
 	if(!any(is.na(att[[p]]$add.line))){
 		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
 		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
@@ -473,7 +339,7 @@ bar_cl_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy, tmp.median.limsy), expx=FALSE, flip = flip)
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, expx=FALSE, flip = flip)
 
 	pl
 }
@@ -497,26 +363,6 @@ box_summary_build <- function(pl, p, DF, att, flip = FALSE){
 
 
 	ncolors <- length(att$colors)
-	  #################################
-	  #################################
-	  #*** insert space for median row	
-	  tmp.median.limsy <- NULL
-
-
-	  if(att$median.row) {
-	    if(!any(DF$median)) DF <- rbind(DF, transform(DF[1,], pGrpOrd=ncolors+1, pGrp=att$m.pGrp, median=TRUE, rank='', 
-								tmp.data1=median(DF$tmp.data1), 
-								tmp.data2=median(DF$tmp.data2), 
-								tmp.data3=median(DF$tmp.data3), 
-								tmp.data4=median(DF$tmp.data4), 
-								tmp.data5=median(DF$tmp.data5), 
-								tmp.data6=median(DF$tmp.data6), 
-								tmp.data7=median(DF$tmp.data7)))
-	
-	 
-	    DF$color[DF$median] <- ncolors
-	    tmp.median.limsy <- c(-.5, -1.5)	# c(0, -2)
-	  }
 
 	  #################################
 	  #################################
@@ -538,12 +384,6 @@ box_summary_build <- function(pl, p, DF, att, flip = FALSE){
 		scale_colour_manual(values='black', guide='none') +
 		scale_fill_manual(values=att$colors, guide='none')
 
-
-	if(att[[p]]$median.line) pl <- pl + geom_vline(aes(xintercept = median(tmp.data)), data=DF, 
-							colour=att[[p]]$median.line.col, 
-							linetype = att[[p]]$median.line.typ, 
-							size = att[[p]]$median.line.size)
-
 	if(!any(is.na(att[[p]]$add.line))){
 		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
 		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
@@ -558,7 +398,7 @@ box_summary_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl <- plot_opts(p, pl, att)		
 	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=c(tmp.limsy,tmp.median.limsy), expx=FALSE, flip = flip)
+	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, expx=FALSE, flip = flip)
 
 	pl
 }

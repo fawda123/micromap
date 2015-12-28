@@ -12,12 +12,6 @@
 #' @param grp.by The column name from stat.data with which to order the lines of the output graphic for a standard mmplot or identifier column on which to group the categorized mmplot.
 #' @param rev.ord specifies whether the plot should be displayed in reverse order of the ranking column. The default is FALSE.
 #' @param grouping the number of lines per perceptual group (for the standard mmplot only). Can be a single number to have the same numer in each group or a vector of numbers for unequal groupings.
-#' @param median.row specifies whether a median row should be included.  If an odd number of data lines are supplied, a data line itself will be used as the median, otherwise median entries will be calculated from the supplied data. Note that without a median row maps are forced into proper size.
-#' @param vertical.align controls vertical alignment of the median row.
-#' @param median.color specifies color of the median row.
-#' @param median.text.color specifies color of text in the median row.
-#' @param median.text.size specifies size of text in the median row.
-#' @param median.text.label specifies the label for text in the median row.
 #' @param cat category column within stats table for a categorization type mmplot.
 #' @param colors a vector of colors for the perceptual groups.  The default is brewer.pal(max(grouping), 'Spectral') for mmplot and brewer.pal(10, 'Spectral') for mmgroupedplot).  The colors are passed to \code{\link[grDevices]{colorRampPalette}} to create a continuous color vector equal in length to the groupings. 
 #' @param map.color the color to fill in previously displayed polygons.
@@ -70,7 +64,7 @@
 #' 	panel.types = c('labels', 'dot', 'dot','map'),
 #' 	panel.data = list('state','pov','ed', NA),
 #' 	ord.by = 'pov',   
-#' 	grouping = 5, median.row = TRUE,
+#' 	grouping = 5,
 #' 	map.link = c('StateAb','ID'))
 #' 
 #' # publication figure 1a
@@ -78,8 +72,7 @@
 #' 	panel.types = c('labels', 'dot', 'dot','map'),
 #' 	panel.data = list('state','pov','ed', NA),
 #' 	ord.by = 'pov',  
-#' 	grouping = 5, 
-#'   	median.row = TRUE,
+#' 	grouping = 5,
 #' 	map.link = c('StateAb','ID'),
 #' 	
 #'   	plot.height = 9,							
@@ -107,9 +100,7 @@
 #' 	panel.data = list('points', 'state', 'pov', 'ed', NA),
 #' 	map.link = c('StateAb','ID'),
 #' 	ord.by = 'pov', 
-#' 	grouping = 5, 
-#' 	median.row = TRUE, 
-#' 	
+#' 	grouping = 5,
 #' 	plot.height = 9, 
 #' 	
 #' 	colors = c('red','orange','green','blue','purple'),
@@ -143,8 +134,7 @@
 #' 	panel.data = list(NA, 'points', 'state', 'pov', 'ed'),
 #' 	map.link = c('StateAb','ID'),
 #' 	ord.by = 'pov', 
-#' 	grouping = 5, 
-#' 	median.row = TRUE,
+#' 	grouping = 5,
 #' 
 #' 	plot.height = 9, 
 #' 	
@@ -204,12 +194,6 @@ mmplot.default <- function(map.data,
   nPanels = length(panel.types),	
   ord.by, rev.ord = FALSE,	
   grouping, 		
-  median.row = FALSE, 		
-  vertical.align = 'top',
-  median.color = gray(.5),
-  median.text.color = 'black',
-  median.text.size = 1,
-  median.text.label = 'Median',
   colors = brewer.pal(11, "Spectral"),	
   map.all = FALSE, 
   map.color2 = 'lightgray',
@@ -234,10 +218,9 @@ mmplot.default <- function(map.data,
   dStats <- stat.data
   dMap <- map.data
 
-  # get plot colors, add median if supplied
+  # get plot colors
   colors = colorRampPalette(colors)(grouping)
-  if(median.row) colors <- c(colors, median.color) 
-  
+
   pps = plot.panel.spacing*.05
   
   ##
@@ -260,8 +243,7 @@ mmplot.default <- function(map.data,
     colors = colors,
   	map.spacing = map.spacing*.025,
   	plot.width = plot.width,
-  	plot.height = plot.height,
-  	median.row = median.row
+  	plot.height = plot.height
     )			
 
   # grab default attribute lists for each panel
@@ -310,13 +292,7 @@ mmplot.default <- function(map.data,
     }
     
   }
-  
-  ### several median options to carry over to the map panel
-  a$median.text.color <- median.text.color
-  a$median.text.size <- median.text.size
-  a$median.text.label <- median.text.label
-  
-  
+
   ### There are several artifact map arguments that can 
   ###   be translated to the new way of doing things
   if(any(panel.types == 'map')){
@@ -345,17 +321,11 @@ mmplot.default <- function(map.data,
   ##########################
   # move dStats into the DF variable, add an overall rank column, a perceptual group column based on ranks, a
   # 	within perceptual group ranking, and a column specifying if any entry row should be the median row 												
-  DF <- create_DF_rank(dStats, ord.by, grouping, median.row, rev.ord, vertical.align)
+  DF <- create_DF_rank(dStats, ord.by, grouping, rev.ord)
   
-  # add entries in the attribute list so that information about the median can be passed 
-  # 	among all the panel building and cleaning functions
-  if(any(DF$median)){
-    a$m.pGrp <- DF$pGrp[DF$median]
-    a$m.rank <- DF$rank[DF$median]
-  } else {
-    a$m.rank <- max(DF$rank+1)/2
-    a$m.pGrp <- DF$pGrp[DF$rank == floor(a$m.rank)] + .5
-  }
+  # add entries in the attribute list 
+  a$m.rank <- max(DF$rank+1)/2
+  a$m.pGrp <- DF$pGrp[DF$rank == floor(a$m.rank)] + .5
   
   # Many panel plotting functions add extra columns to the DF table. This is
   #   created here as a reference to default back to after each panel is conctructed
@@ -396,7 +366,7 @@ mmplot.default <- function(map.data,
     totalUnitWidth = pps * (length(all_atts(a,'panel.width'))+1) + sum(as.numeric(all_atts(a,'panel.width')))
   
     mapPanelHeight <- max(DF$pGrpOrd[!is.na(DF$pGrpOrd)])+1
-    totalUnitHeight = max(DF$pGrp[!is.na(DF$pGrp)]) * mapPanelHeight + median.row*1					
+    totalUnitHeight = max(DF$pGrp[!is.na(DF$pGrp)]) * mapPanelHeight				
   
     ns <- max(unlist(lapply(all_atts(a, 'panel.header'), function(x) length(strsplit(x, '\n')[[1]])))) 
     adj.plot.height <- plot.height - 
@@ -474,7 +444,7 @@ mmplot.default <- function(map.data,
   if(flip){
 
     ## left align plots if landscape
-
+browser()
     # get max width and reassign to all
     plots <- lapply(plots, ggplotGrob)
     widths <- lapply(plots, function(x) x$widths[2:3])

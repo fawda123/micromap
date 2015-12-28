@@ -81,7 +81,7 @@ graph_opts <- function(i, pl, a){
 ### sets graph boundaries, ticks, labels, borders
 axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, flip = FALSE){
 
-	# i=p; a=att; limsx=tmp.limsx; limsy=c(tmp.limsy,tmp.median.limsy); border=FALSE; expx=FALSE
+	# i=p; a=att; limsx=tmp.limsx; limsy=c(tmp.limsy); border=FALSE; expx=FALSE
 
 	# many features are "hidden" by simply coloring the same color as the background so
 	#   if panel background is NA we assume "white" will effectively do the hiding
@@ -90,24 +90,20 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	# specify label size as maximum of all requested label sizes
   label.size <- as.numeric(max(all_atts(a, 'xaxis.labels.size')))*10
 
-  # limsy will sometimes be in the form (c(lower bound, upper bound, lower bound for the median , upper bound for the median))
+  # limsy will sometimes be in the form (c(lower bound, upper bound))
 	#   if thats the case, we split it into the two seperate limits here
-    
-  median.limsy <- NULL
 
   # flip limits if flip true
   # other exceptions below
-  # have to deal with median limits if present
-#   if(flip){
-#     
-#     if(length(limsy) == 4) median.limsy <- rev(-1 * limsy[3:4])
-#     limsy <- rev(-1 * limsy[1:2])
-#     
-#   } else { 
+  if(flip){
     
-    if(length(limsy)==4){median.limsy <- limsy[3:4]; limsy <- limsy[1:2]}
+    limsy <- rev(-1 * limsy[1:2])
     
-  # }
+  } else { 
+    
+    limsy <- limsy[1:2]
+
+  }
  
   ##############    
   ### X axis ### 
@@ -148,7 +144,7 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	### axis limits and expansion ###
 	if (!any(is.na(limsx))) x.limits <- TRUE
 
-		# if there is a border to be added, we must manually deal with expansion
+	# if there is a border to be added, we must manually deal with expansion
   if(!expx){				
 		x.expand <- TRUE
 		xstr.expand <- as.character(", expand=c(0,0)")
@@ -157,13 +153,10 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	xstr.limits <- as.character(paste('c(',min(limsx), ',', max(limsx),')'))
 	xstr.limits <- paste(", limits=", xstr.limits)
 
-
-
 	### panel footers (not completed) ###
 	# "panel footers" are really just augmented x axis titles
 	# if all axis titles are blank then we hide axis titles on the whole plot	
 	if(all(is.na(all_atts(a, 'xaxis.title')))) pl <- pl + theme(axis.title.x = element_blank()) 	
-
 
 	### axis lines ###
   # note: axis lines are always there, if the user doesn't want to 
@@ -216,7 +209,7 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
  
 	# put it all together and execute the eval call
 	xstr <- paste("scale_x_continuous(", xstr.title)
-	if (x.expand) xstr <- paste(xstr, xstr.expand)
+	# if (x.expand) xstr <- paste(xstr, xstr.expand)
 	if (x.breaks) xstr <- paste(xstr, xstr.breaks)
 	if (x.labels) xstr <- paste(xstr, xstr.labels)
 	if (x.limits) xstr <- paste(xstr, xstr.limits)
@@ -253,7 +246,7 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	ystr.title  <- ifelse(!is.na(a[[i]]$yaxis.title), a[[i]]$yaxis.title, "''")
 
 	### axis limits and expansion ###
-	ystr.expand <- ", expand=c(0,0)"
+	ystr.expand <- NULL#", expand=c(0.2,0.2)"
 
 	limsy <- limsy + c(-1,1) * diff(limsy)*a$plot.pGrp.spacing
 
@@ -261,42 +254,25 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	ystr.limits <- paste(", limits=", ystr.limits)
 
 	pl <- pl + theme(panel.margin = unit(0, "lines"))
-	# if (any(is.na(limsy)) | a$median.row) y.limits <- FALSE else y.limits <- TRUE
 
 	# put it all together and execute the eval call
 	ystr <- paste("scale_y_continuous(", ystr.title, ystr.expand, ystr.breaks)
 	# if (y.limits) ystr <- paste(ystr, ystr.limits)
 	ystr <- paste(ystr, ")")
 
-	if(flip) ystr <- gsub('_y_continuous', '_x_reverse', ystr)
+	if(flip) ystr <- gsub('_y_', '_x_', ystr)
 	
   pl <- pl + eval(parse(text=ystr))
 
   ##############
   ### border ###   
   ##############
-
-  borderx <- range(limsx) + c(1,-1) * diff(range(limsx))*.001
-	bordery <- range(limsy) + c(0,-1) * diff(range(limsy))*.001
-	
-	if(!is.null(median.limsy)) median.limsy <- range(median.limsy) - c(0, diff(range(median.limsy))*.001)
-
-	tmp.border <- data.frame(pGrp=rep(1:max(pl$data$pGrp),each=2), ymin=bordery[1], ymax=bordery[2], 
-									xmin=borderx[1], xmax=borderx[2])
-	if(a$median.row) tmp.border <- rbind(subset(tmp.border, !pGrp==a$m.pGrp), data.frame(pGrp=a$m.pGrp, 
-	  ymin=median.limsy[1], ymax=median.limsy[2], xmin=borderx[1], xmax=borderx[2]))
-
-	if(border) border.color <- a[[i]]$graph.border.color else border.color <- NA
-		
-	if(flip){
-	  pl <- pl + geom_rect(aes(xmin = ymin, xmax=ymax, ymin=xmin, ymax=xmax), data=tmp.border, 
-					colour= border.color, fill=NA)
-	} else {
-    pl <- pl + geom_rect(aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax), data=tmp.border, 
-			colour= border.color, fill=NA)
-	}
-	
-	pl <- pl + theme(axis.line = element_blank())
+  
+	if(border) 
+	  pl <- pl + theme(
+	    panel.border = element_rect(colour = "black", fill=NA, size=0.8), 
+	    axis.line = element_blank()
+	  )
 
 	pl
 
@@ -320,13 +296,6 @@ assimilatePlot <- function(pl, i, a, limsx=NA, limsy=NA){
 		# limsy <- limsy + c(1,-1)*diff(limsy)*.05
 		limsy <- -c(.5, max(a$grouping)+.5)
 	  }
-
-	if(a$median.row){	
-		pl <- pl + scale_colour_manual(values=c(a$colors,gray(.5)), guide='none') 
-		
-		median.limsy <-  c(-.5, -1.5)
-		limsy <- c(limsy, median.limsy)
-	}
 
 	pl <- axis_opts(i,pl,a, limsx=limsx, limsy=limsy, border=TRUE)
 	pl

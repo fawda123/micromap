@@ -121,11 +121,6 @@ dot_att <- function(show=FALSE) {
 				  	point.type=as.numeric(19),
 					point.border=as.logical(TRUE),
 
-					median.line=as.logical(FALSE),
-					median.line.col='black',
-					median.line.typ='longdash',
-					median.line.size=1,
-
 					add.line=NA,
 					add.line.col='black',
 					add.line.typ='longdash',
@@ -151,11 +146,6 @@ dot_cl_att <- function(show=FALSE) {
  
 				  	line.width=as.numeric(1),
 
-					median.line=as.logical(FALSE),
-					median.line.col='black',
-					median.line.typ='longdash',
-					median.line.size=1,
-
 					add.line=NA,
 					add.line.col='black',
 					add.line.typ='longdash',
@@ -176,11 +166,6 @@ bar_att <- function(show=FALSE) {
   tmp.att <- append(standard_att(), 
 				list(graph.bar.size=as.numeric(1),
 
-					median.line=as.logical(FALSE),
-					median.line.col='black',
-					median.line.typ='longdash',
-					median.line.size=1,
-
 					add.line=NA,
 					add.line.col='black',
 					add.line.typ='longdash',
@@ -195,11 +180,6 @@ bar_cl_att <- function(show=FALSE) {
   tmp.att <- append(standard_att(), 
 				list(graph.bar.size=as.numeric(1),
 
-					median.line=as.logical(FALSE),
-					median.line.col='black',
-					median.line.typ='longdash',
-					median.line.size=1,
-
 					add.line=NA,
 					add.line.col='black',
 					add.line.typ='longdash',
@@ -213,11 +193,6 @@ bar_cl_att <- function(show=FALSE) {
 box_summary_att <- function(show=FALSE) {
   tmp.att <- append(standard_att(), 
 				list(graph.bar.size=as.numeric(1),
-
-					median.line=as.logical(FALSE),
-					median.line.col='black',
-					median.line.typ='longdash',
-					median.line.size=1,
 
 					add.line=NA,
 					add.line.col='black',
@@ -252,8 +227,6 @@ map_att <- function(show=FALSE) {
 				withdata.border.color=gray(.75),
 				withdata.border.size=1,
 
-				median.fill=gray(.5),
-
 				nodata.fill='white',
 				nodata.border.color='white',
 				nodata.border.size=1
@@ -271,13 +244,13 @@ map_att <- function(show=FALSE) {
 
 sample_att <- function(size=1, type=rep('standard',size), ord.by=NA, grouping=5,
 	colors=brewer.pal(max(grouping), "Spectral"), plot.pGrp.spacing=.05,
-	plot.panel.margins=c(0,1,0,0), panel.data=list(NA), median.row=FALSE, show=FALSE){
+	plot.panel.margins=c(0,1,0,0), panel.data=list(NA), show=FALSE){
 
 	att <- vector("list", size)
 	for(t in 1:size) att[[t]] <- eval(parse(text=paste(type[t],'_att()',sep='')))
 	for(t in 1:size) att[[t]] <- append(att[[t]], list(panel.data=NA))
 	att <- append(att, list(ord.by=ord.by, grouping=grouping, colors=colors,
-			plot.pGrp.spacing=plot.pGrp.spacing, plot.panel.margins=plot.panel.margins, median.row=median.row))	
+			plot.pGrp.spacing=plot.pGrp.spacing, plot.panel.margins=plot.panel.margins))	
 	return(att)
 }
 

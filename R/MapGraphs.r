@@ -59,21 +59,6 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 			dHull$IDpoly <- paste(dHull$ID,dHull$poly,sep='.')
 	}
 
-
-	#*** If there is an odd number of polygons and a median row in our map 
-	#***   we must deal with the median polygon specially
-	if(att$median.row & any(mapDF$pGrp==att$m.pGrp)){
-		#*** find the median polygon set the fill color for it to be the user specified median color
-		#*** create copies of that polygon to be displayed in the preceding 
-		#*** and subsequent perceptual groups  
-		mapDF.median 		<- subset(mapDF, pGrp==att$m.pGrp)
-		mapDF.median$fill.color <- ncolors+1	
-		mapDF.median		<- rbind(transform(mapDF.median, pGrp=(att$m.pGrp-1), IDpoly='median1'),
-						transform(mapDF.median, pGrp=(att$m.pGrp+1), IDpoly='median2'))
-		
-		mapDF <- rbind(subset(mapDF, !pGrp==att$m.pGrp), mapDF.median)
-	}
-
 	#*** Creates the map panel object 	
 	pl <- ggplot(mapDF, aes(x=coordsx, y=coordsy, group=IDpoly)) 
 
@@ -174,36 +159,6 @@ RankMaps <- function(pl, p, mapDF, att, flip){
     pl <- pl + facet_grid(.~pGrp) + coord_fixed()  
 	else 
     pl <- pl + facet_grid(pGrp~.) + coord_fixed()
-
-  #################################
-  #################################
-  #*** insert white space for median row	
-  mapDF.median <- data.frame(pGrpOrd=1, pGrp=att$m.pGrp, 
-				rank=(max(mapDF$rank)+1)/2, ID='median', 
-				coordsx=range(mapDF$coordsx)[c(1,1,2,2,1)], 
-				coordsy=c(.5, -.5)[c(1,2,2,1,1)],
-#					textx=median(range(mapDF$coordsx)), texty=median(range(mapDF$coordsy)),	
-				tmp.label=att$median.text.label,
-				textx=median(range(mapDF$coordsx)), texty=0, tmp.label='Median',
-				region=1, poly=1, plug=0, hole=0, IDpoly='median')
-  
-  if(att$median.row){ 
-    
-    warning('Aspect ratio of maps not 1:1 if median row is present')
-    
-    #landscape
-    if(flip)
-      pl <- pl + 
-			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), angle = 90, colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) + 
-      facet_grid(.~pGrp, scales = 'free', space = 'free') 
-    
-    # or portrait
-    else
-      pl <- pl + 
-			  geom_text(aes(x=textx, y=texty, label=tmp.label, hjust=.5, vjust=.4), colour=att$median.text.color, size=5*att$median.text.size, data=mapDF.median) +
-      facet_grid(pGrp~., scales = 'free', space = 'free')
-  
-  }
 
   #################################
   #################################

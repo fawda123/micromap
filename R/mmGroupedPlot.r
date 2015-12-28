@@ -125,7 +125,6 @@ for(j in 1:length(panel.types)) {
 DF <- create_DF_cat(dStats, grp.by, cat)
 
 # *** these are all meaningless in the category context but are referenced by other functions
-a$median.row <- FALSE			
 a$two.ended.maps <- FALSE
 a$m.pGrp <- (max(DF$pGrp)+1)/2
 a$m.rank <- NA

@@ -14,7 +14,6 @@ mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=5,
-  median.row=T,
   map.link=c("StateAb","ID"),
   flip = F
 )
@@ -42,10 +41,9 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # test different panel types
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "pan","dot", "map"),
+  panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=5,
-  median.row = T, 
   map.link=c("StateAb","ID")
 )
 
@@ -84,7 +82,6 @@ mmgroupedplot(stat.data=vegCov,
   map.link=c("Subpopulation", "ID"),
   flip = F
   )
-
 
 # ok
 mmgroupedplot(stat.data=vegCov,
