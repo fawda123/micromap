@@ -1,4 +1,11 @@
 ##
+# to do 
+#
+# figure out why fixed axes doesn't work when converted to gtable at end of mmplot
+# align text labels with points if dangling perceptual group (DC)
+# continue generic ggplot2 infrastructure
+
+##
 # some tests
 
 # stat data, data.frame

@@ -147,7 +147,7 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	# if there is a border to be added, we must manually deal with expansion
   if(!expx){				
 		x.expand <- TRUE
-		xstr.expand <- as.character(", expand=c(0,0)")
+		xstr.expand <- as.character(", expand=c(0.2,0.2)")
 	  }
 
 	xstr.limits <- as.character(paste('c(',min(limsx), ',', max(limsx),')'))
@@ -246,7 +246,7 @@ axis_opts <- function(i, pl, a, limsx=NA, limsy=NA, border=TRUE, expx=FALSE, fli
 	ystr.title  <- ifelse(!is.na(a[[i]]$yaxis.title), a[[i]]$yaxis.title, "''")
 
 	### axis limits and expansion ###
-	ystr.expand <- NULL#", expand=c(0.2,0.2)"
+	ystr.expand <- ", expand=c(0.2,0.2)"
 
 	limsy <- limsy + c(-1,1) * diff(limsy)*a$plot.pGrp.spacing
 

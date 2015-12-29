@@ -440,8 +440,7 @@ mmplot.default <- function(map.data,
   ##############################
   ##### construct the plot #####
   ##############################
-
-  browser()
+  
   ## use gtable to left align 
   plots <- lapply(plots, ggplotGrob)
   toeval <- paste0('plots[[', seq(length(plots)), ']]')
@@ -453,6 +452,5 @@ mmplot.default <- function(map.data,
   # plot
   grid.draw(plots)
     
-
 } 
 

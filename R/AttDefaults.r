@@ -15,7 +15,7 @@ standard_att <- function(show=FALSE) list(
 
   left.margin=NA,
   right.margin=NA,
-  panel.margins=c(1, -0.25, 1, -0.25),
+  panel.margins=c(0.2, 0.2, 0.2, 0.2),
 
 
   graph.grid.major=as.logical(TRUE),
@@ -244,7 +244,7 @@ map_att <- function(show=FALSE) {
 
 sample_att <- function(size=1, type=rep('standard',size), ord.by=NA, grouping=5,
 	colors=brewer.pal(max(grouping), "Spectral"), plot.pGrp.spacing=.05,
-	plot.panel.margins=c(0,1,0,0), panel.data=list(NA), show=FALSE){
+	plot.panel.margins=c(0.2, 0.2, 0.2, 0.2), panel.data=list(NA), show=FALSE){
 
 	att <- vector("list", size)
 	for(t in 1:size) att[[t]] <- eval(parse(text=paste(type[t],'_att()',sep='')))
