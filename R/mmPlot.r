@@ -441,26 +441,18 @@ mmplot.default <- function(map.data,
   ##### construct the plot #####
   ##############################
 
-  if(flip){
+  browser()
+  ## use gtable to left align 
+  plots <- lapply(plots, ggplotGrob)
+  toeval <- paste0('plots[[', seq(length(plots)), ']]')
+  toeval <- paste(toeval, collapse = ', ')
+  if(flip) toeval <- paste0('rbind(', toeval, ', size = "last")')
+  else toeval <- paste0('cbind(', toeval, ', size = "last")')
+  plots <- eval(parse(text = toeval))
 
-    ## left align plots if landscape
-browser()
-    # get max width and reassign to all
-    plots <- lapply(plots, ggplotGrob)
-    widths <- lapply(plots, function(x) x$widths[2:3])
-    maxwidth <- do.call('unit.pmax', widths)
-  
-    for(i in 1:length(plots)) plots[[i]]$widths[2:3] <- maxwidth
-  
-    # plot
-    grid.arrange(grobs = plots, ncol = 1)
+  # plot
+  grid.draw(plots)
     
-  } else {
-    
-    # plot
-    grid.arrange(grobs = plots, ncol = length(plots))
-     
-  }
 
 } 
 
