@@ -51,7 +51,7 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
     	     	geom_text(aes(x = tmp.y, y = 0, label = tmp.labels, 
     				hjust=tmp.adj, vjust=.4), angle = 90,
     				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
-    	     	facet_grid(.~pGrp, scales="free_x") +
+    	     	facet_grid(.~pGrp) +
         		scale_colour_manual(values=att$colors) 
   
 	} else {
@@ -60,7 +60,7 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
 	     	geom_text(aes(x = 0, y = -tmp.y, label = tmp.labels, 
 				hjust=tmp.adj, vjust=.4), 
 				family=att[[p]]$text.font, fontface=att[[p]]$text.face, size=tmp.tsize) +
-	     	facet_grid(pGrp~., scales="free_y") +
+	     	facet_grid(pGrp~.) +
     		scale_colour_manual(values=att$colors) 
 	  
 	}

@@ -41,6 +41,8 @@
 #'
 #' @author Quinn Payton \email{Payton.Quinn@@epa.gov}
 #' 
+#' @import gtable
+#' 
 #' @keywords hplot
 #' 
 #' @aliases mmplot mmgroupedplot

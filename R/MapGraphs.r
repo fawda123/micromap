@@ -223,8 +223,7 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 	pl  <- graph_opts(p, pl, att)	
 
 	pl <- pl + theme(panel.margin = unit(0, "lines"))
-
-
+	
 	pl 
 
 }
