@@ -1,8 +1,10 @@
 ##
 # to do 
 #
-# align text labels with points if dangling perceptual group (DC)
+# figure out how to deal with coord flip in bar plots, can this be ided in axis_opts and dealt with if statement (line 214)?
+#        https://github.com/hadley/ggplot2/issues/647
 # continue generic ggplot2 infrastructure
+# conf limits for plots if appropriate
 
 ##
 # some tests
@@ -15,7 +17,7 @@ data("USstates")
 statePolys <- create_map_table(USstates, IDcolumn="ST") 
 
 ##
-# returns warning about aspect ratio, maps should align with other panels
+# standard
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
@@ -25,7 +27,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 )
 
 ##
-# map aspect ratios fixed at 1:1, maps should align with other panels
+# diff grouping
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
@@ -35,7 +37,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 )
 
 ## 
-# problem... not a micromap issue
+# flipped
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot","dot", "map"),
   panel.data=list("state","pov","ed", NA),
@@ -47,7 +49,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # test different panel types
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "dot","dot", "map"),
+  panel.types=c("labels", "dot","bar", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=5,
   map.link=c("StateAb","ID")

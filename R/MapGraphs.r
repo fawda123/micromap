@@ -186,43 +186,18 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 				colour=bgcolor, 			
 				data=transform(bdrCoords, pGrp=g))
 
-
-	#*** "house keeping" functions to align all panels and apply the user's graphical specifications\	
-	xstr.title <-  "''"
-
-
-	  # If all axis titles aren't NA then we must change the other titles to be blank in order to leave space
-	  # 	for them at the bottom. If any title is multiple lines (ie contains '\n') then we must add in 
-	  # 	the correct number of character returns to the other titles in order to make the plot uniform
-	if(!all(is.na(all_atts(att, 'xaxis.title')))){
-		tmp.titles <- lapply(all_atts(att, 'xaxis.title'), function(t) if(is.na(t)|t=='') t=' ' else t)
-		tmp.title <- tmp.titles[[p]]
-		ns <- max(unlist(lapply(tmp.titles, function(x) length(strsplit(x, '\n')[[1]])))) - length(strsplit(tmp.title,'\n')[[1]])  
-		if(ns>0) tmp.title <- paste(tmp.title, rep(' \n ',ns), sep='')
-		
-		xstr.title <- paste("'",tmp.title,"'",sep='')
-		pl <- pl + theme(axis.title.x = element_text(size=8*att[[p]]$xaxis.title.size, colour=bgcolor)) 
-	  } else {
-		pl <- pl + theme(axis.title.x = element_blank()) 
-	}
-	
-
-	if(any(c(all_attsb(att, 'xaxis.ticks.display'), all_attsb(att, 'xaxis.text.display')))){
-		pl <- pl + theme(axis.text.x = element_text(colour=bgcolor)) +
-				theme(axis.ticks = element_line(colour=bgcolor))
-	 } else { 
-		pl <- pl + theme(axis.text.x = element_blank()) +
-				theme(axis.ticks = element_blank()) 
-	 }
-
-	ystr <- paste("scale_y_continuous('', breaks=NULL, expand=c(0,0))")
-
-	pl <- pl + eval(parse(text=ystr))
-
-	pl  <- plot_opts(p, pl, att)		
-	pl  <- graph_opts(p, pl, att)	
-
-	pl <- pl + theme(panel.margin = unit(0, "lines"))
+	# remove everything except plot content
+	pl <- pl + theme(
+    panel.grid.minor = element_blank(), 
+    panel.grid.major = element_blank(), 
+    axis.text = element_blank(), 
+    axis.title = element_blank(), 
+    axis.ticks = element_blank(), 
+    panel.background = element_rect(colour = 'white', fill = 'white'),
+    strip.background = element_blank(), 
+	  strip.text.x = element_blank(), 
+		strip.text.y = element_blank()
+    )
 	
 	pl 
 

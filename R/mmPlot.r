@@ -433,16 +433,13 @@ mmplot.default <- function(map.data,
 	    plots[[p]] <- eval(parse(text = paste('pan_build(plots[[p]], p, "', panel.types[p], '", DF, a, flip = flip)',sep = '')))
      
     }		
-				
-    # reset DF table (delete added tmp.data columns and what not)
-    DF <- DF.hold	
-      
+
   }
   
   ##############################
   ##### construct the plot #####
   ##############################
-  
+
   ## use gtable to left align 
   plots <- lapply(plots, ggplotGrob)
   toeval <- paste0('plots[[', seq(length(plots)), ']]')

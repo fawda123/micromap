@@ -1,3 +1,4 @@
+#' labels plot
 labels_build <- function(pl, p, DF, att, flip = FALSE){ 
 
 	DF$tmp.labels <- DF[,unlist(att[[p]]$panel.data)]
@@ -65,14 +66,98 @@ labels_build <- function(pl, p, DF, att, flip = FALSE){
 	  
 	}
 
-	pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)		
-  pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, border=FALSE, flip = flip)
+	# remove everything except plot content
+  pl <- gen_cln(pl, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
 	pl
 
 }
 
+#' generic panel function
+pan_build <- function(pl, p, ptype, DF, att, flip = FALSE){
+ 
+  # stop if panel type does not exist
+  if(!ptype %in% c('dot', 'bar'))
+    stop(paste0("unknown panel type -- '", ptype, "'", sep = ''))
 
+  # subset data to plot
+  xvar <- att[[p]]$panel.data
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% xvar] <- 'xvar'
+
+  # padding for pgrps by facet
+  tmp.limsx <- range(DF[,unlist(att[[p]]$panel.data)], na.rm=T)
+	if(any(!is.na(att[[p]]$xaxis.ticks))) tmp.limsx <- range(c(tmp.limsx, att[[p]]$xaxis.ticks))
+	tmp.limsx <- tmp.limsx + c(-1,1) * diff(tmp.limsx)*.05
+	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
+	if(diff(tmp.limsx)==0) tmp.limsx <- tmp.limsx + c(-.5,.5)
+  
+  # make plot
+  pl <- eval(parse(text = paste(ptype, '_build(toplo, att, flip = flip)',sep = '')))
+
+  # clean up plot
+	pl <- plt_cln(pl, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
+	
+	return(pl) 
+	
+}
+
+#'
+dot_build <- function(pl, att, flip = FALSE){ 
+ 
+  # make plot
+  pl <- ggplot(pl)
+
+  if(flip){
+    
+    pl <- pl + 
+  		geom_point(aes(x = pGrpOrd, y = xvar, colour = factor(color))) +
+  	  facet_grid(.~pGrp) + 
+  		scale_colour_manual(values=att$colors, guide='none')   
+    
+  } else {
+    
+    pl <- pl +   
+      geom_point(aes(x=xvar, y=-pGrpOrd, colour=factor(color))) +
+  	  facet_grid(pGrp~.) + 
+  		scale_colour_manual(values=att$colors, guide='none') 
+    
+  }
+  
+  return(pl)
+	
+}
+
+#'
+bar_build <- function(pl, att, flip = FALSE){ 
+  
+  # make plot
+  pl <- ggplot(pl)
+
+  if(flip){
+    
+    pl <- pl + 
+  		geom_bar(aes(x = pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') +
+  	  facet_grid(.~pGrp) +
+  		scale_fill_manual(values=att$colors, guide='none')   
+    
+  } else {
+    
+    pl <- pl +   
+      geom_bar(aes(x = -pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') + 
+  	  coord_flip() + 
+      facet_grid(pGrp~.) +
+  		scale_fill_manual(values=att$colors, guide='none') 
+    
+  }
+  
+  return(pl)
+
+}
+
+######
+# everything below here needs to be dealt with somehow (remove, modify, etc.)
+
+#'
 ranks_build <- function(pl, p, DF, att, flip = FALSE){ 
 	tmp.tsize <- att[[p]]$size*4
 	DF$tmp.y <- -DF$pGrpOrd*att[[p]]$size
@@ -110,8 +195,7 @@ ranks_build <- function(pl, p, DF, att, flip = FALSE){
 	
 }
 
-
-
+#' 
 dot_legend_build <- function(pl, p, DF, att, flip = FALSE){ 
 	DF$tmp.data <- rep(0, nrow(DF))
 
@@ -144,210 +228,22 @@ dot_legend_build <- function(pl, p, DF, att, flip = FALSE){
 	pl
 }
 
-# generic panel function
-pan_build <- function(pl, p, ptype, DF, att, flip = FALSE){
- 
-  # stop if panel type does not exist
-  if(!ptype %in% c('dot', 'bar'))
-    stop(paste0("unknown panel type -- '", ptype, "'", sep = ''))
+#'
+dot_cl_build <- function(pl, flip = FALSE){ 
 
-  # subset data to plot
-  xvar <- att[[p]]$panel.data
-  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
-  names(toplo)[names(toplo) %in% xvar] <- 'xvar'
-
-  # padding for pgrps by facet
-  tmp.limsx <- range(DF[,unlist(att[[p]]$panel.data)], na.rm=T)
-	if(any(!is.na(att[[p]]$xaxis.ticks))) tmp.limsx <- range(c(tmp.limsx, att[[p]]$xaxis.ticks))
-	tmp.limsx <- tmp.limsx + c(-1,1) * diff(tmp.limsx)*.05
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-	if(diff(tmp.limsx)==0) tmp.limsx <- tmp.limsx + c(-.5,.5)
-  
-  # make plot
-  pl <- eval(parse(text = paste(ptype, '_build(toplo, p, att, flip = flip)',sep = '')))
-
-  # pass to axis_opts, etc.
-  pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
-	
-	return(pl) 
+  NULL
 	
 }
 
-dot_build <- function(pl, p, att, flip = FALSE){ 
- 
-  # make plot
-  pl <- ggplot(pl)
-
-  if(flip){
-    
-    pl <- pl + 
-  		geom_point(aes(x = pGrpOrd, y = xvar, colour = factor(color)), 
-  				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-  	  facet_grid(.~pGrp) + #, scales="free_x", space="free") +
-  		scale_colour_manual(values=att$colors, guide='none')   
-    
-  } else {
-    
-    pl <- pl +   
-      geom_point(aes(x=xvar, y=-pGrpOrd, colour=factor(color)), 
-  				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-  	  facet_grid(pGrp~.) + #, scales="free_y", space="free") +
-  		scale_colour_manual(values=att$colors, guide='none') 
-    
-  }
+#'
+bar_cl_build <- function(pl, flip = FALSE){ 
   
-  return(pl)
-	
+  NULL
+  
 }
 
-
-bar_build <- function(pl, p, att, flip = FALSE){ 
-  
-  # browser()
-  # make plot
-  pl <- ggplot(pl)
-  
-  if(flip){
-    
-    pl <- pl + 
-  		geom_bar(aes(x = pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') +
-  	  facet_grid(.~pGrp, scales="free_x", space="free") +
-  		scale_fill_manual(values=att$colors, guide='none')   
-    
-  } else {
-    
-    pl <- pl +   
-      geom_bar(aes(x = -pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') + 
-  	  coord_flip() + 
-      facet_grid(pGrp~., scales="free_x", space="free") +
-  		scale_fill_manual(values=att$colors, guide='none') 
-    
-  }
-  
-  return(pl)
-
-}
-
-
-
-dot_cl_build <- function(pl, p, DF, att, flip = FALSE){ 
-	DF$tmp.data1 <- DF[,att[[p]]$panel.data[[1]]]
-	DF$tmp.data2 <- DF[,att[[p]]$panel.data[[2]]]
-	DF$tmp.data3 <- DF[,att[[p]]$panel.data[[3]]]
-
-	DF$tmp.data4 <- c(0, DF$tmp.data1[-nrow(DF)])
-	DF$tmp.data5 <- DF$pGrpOrd - 1
-
-	tmp.limsx <- range(DF[,unlist(att[[p]]$panel.data)], na.rm=T)
-	if(any(!is.na(att[[p]]$xaxis.ticks))) tmp.limsx <- range(c(tmp.limsx, att[[p]]$xaxis.ticks))
-	tmp.limsx <- tmp.limsx + c(-1,1) * diff(tmp.limsx)*.05
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-
-
-	ncolors <- length(att$colors)
-
-	  #################################
-	  #################################
-
-	pl <- ggplot(DF) +
-		geom_segment(aes(x=tmp.data2, y=-pGrpOrd, xend=tmp.data3, yend=-pGrpOrd, 
-				colour=factor(color)), size=att[[p]]$line.width) 
-
-	if(!any(is.na(att[[p]]$add.line))){
-		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.size)==1) att[[p]]$add.line.size <- rep(att[[p]]$add.line.size[1], length(att[[p]]$add.line))
-
-		for(j in 1:length(att[[p]]$add.line)) pl <- pl + geom_vline(xintercept = att[[p]]$add.line[j], 
-										data=DF, colour=att[[p]]$add.line.col[j], 
-										linetype=att[[p]]$add.line.typ[j],
-										size=att[[p]]$add.line.size[j])
-	  }
-
-
-	if(att[[p]]$connected.dots) pl <- pl + geom_segment(aes(x = tmp.data1, y = -pGrpOrd,
-								xend = tmp.data4, yend = -tmp.data5),
-							data = subset(DF, pGrpOrd>1), 
-			            			colour = att[[p]]$connected.col,
-							size = att[[p]]$connected.size, 
-					            	linetype = att[[p]]$connected.typ)   
-   
-  	if(att[[p]]$point.border) pl <- pl + geom_point(aes(x=tmp.data1, y=-pGrpOrd), 
-									size=att[[p]]$point.size*2.5, 
-									pch=att[[p]]$point.type,
-									data=DF)
-
-	pl <- pl + 
-		geom_point(aes(x=tmp.data1, y=-pGrpOrd, colour=factor(color)), 
-				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-	     	facet_grid(pGrp~., scales="free_y", space="free") +
-		scale_colour_manual(values=att$colors, guide='none') 
-
-	pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
-	
-	pl
-	
-}
-
-
-
-
-bar_cl_build <- function(pl, p, DF, att, flip = FALSE){ 
-	DF$tmp.data1 <- DF[,att[[p]]$panel.data[[1]]]
-	DF$tmp.data2 <- DF[,att[[p]]$panel.data[[2]]]
-	DF$tmp.data3 <- DF[,att[[p]]$panel.data[[3]]]
-
-	DF$tmp.adj <- att[[p]]$graph.bar.size
-
-	tmp.limsx <- range(c(0, DF[,unlist(att[[p]]$panel.data)], na.rm=T))
-	if(any(!is.na(att[[p]]$xaxis.ticks))) tmp.limsx <- range(c(tmp.limsx, att[[p]]$xaxis.ticks))
-	tmp.limsx <- tmp.limsx + c(-.001,.05) * diff(tmp.limsx)
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-
-
-	ncolors <- length(att$colors)
-
-	  #################################
-	  #################################
-
-	pl  <- 
-		ggplot(DF) +
-		geom_rect(aes(xmin=0, ymin=-pGrpOrd-(tmp.adj/2), 
-				xmax=tmp.data1, ymax=-pGrpOrd+(tmp.adj/2), 
-				fill=factor(color), colour='black')) +
-	     	geom_errorbarh(aes(x=tmp.data1, xmin=tmp.data2, xmax=tmp.data3, y=-pGrpOrd), 
-				height=.9*att[[p]]$graph.bar.size) + 
-	     	facet_grid(pGrp~., scales="free_y", space="free") +
-		scale_colour_manual(values='black', guide='none') +
-		scale_fill_manual(values=att$colors, guide='none')
-
-	if(!any(is.na(att[[p]]$add.line))){
-		if(length(att[[p]]$add.line.col)==1) att[[p]]$add.line.col <- rep(att[[p]]$add.line.col[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.typ)==1) att[[p]]$add.line.typ <- rep(att[[p]]$add.line.typ[1], length(att[[p]]$add.line))
-		if(length(att[[p]]$add.line.size)==1) att[[p]]$add.line.size <- rep(att[[p]]$add.line.size[1], length(att[[p]]$add.line))
-
-		for(j in 1:length(att[[p]]$add.line)) pl <- pl + geom_vline(xintercept = att[[p]]$add.line[j], 
-										data=DF, colour=att[[p]]$add.line.col[j], 
-										linetype=att[[p]]$add.line.typ[j],
-										size=att[[p]]$add.line.size[j])
-	  }
-
-
-	pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy, expx=FALSE, flip = flip)
-
-	pl
-}
-
-
-
-
-box_summary_build <- function(pl, p, DF, att, flip = FALSE){ 
+#'
+box_summary_build <- function(pl, flip = FALSE){ 
 	if(length(att[[p]]$panel.data)==5) iCols <- c(1,2,2,3,4,4,5) else iCols <- 1:7
 	tmp.data <- DF[,unlist(att[[p]]$panel.data)]
 	tmp.data <- tmp.data[,iCols]
