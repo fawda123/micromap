@@ -1,14 +1,16 @@
-RankMaps <- function(pl, p, mapDF, att, flip){
-	# att=a
-	bgcolor 	<- ifelse(!is.na(att[[p]]$panel.bgcolor), att[[p]]$panel.bgcolor, 'white')
-	outer.hull 	<- att[[p]]$outer.hull		# whether we need to construct an outline of the map poygons
-	ncolors 	<- length(att$colors)
+#' @params fill.region chr string indicating aggregate, two ended, or with data
+RankMaps <- function(pl, mapDF, colors, flip, fill.regions = fill.regions){
+
+  m.pGrp <- unique(mapDF$m.pGrp)
+	bgcolor 	<- 'white'
+	outer.hull 	<- F	# whether we need to construct an outline of the map poygons
+	ncolors 	<- length(colors)
 	nGroups 	<- range(mapDF$pGrp[!is.na(mapDF$pGrp)])	
 
 	mapDF$fill.color <- mapDF$pGrpOrd
 	mapDF$IDpoly 	 <- paste(mapDF$ID,mapDF$poly,sep='.')
 
-	map.all <- att[[p]]$map.all
+	map.all <- F
 
 	#*** store all the polygon data then subset only those with data
 	mapDF.all <- mapDF				
@@ -67,9 +69,9 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 	#***   do so first so they appear in the background
 	if(map.all==TRUE){
 		if(nrow(subset(mapDF.all, is.na(pGrp)))>0) for(g in nGroups[1]:nGroups[2]) pl <- pl + 
-			geom_polygon(fill=att[[p]]$nodata.fill, 
-				colour=att[[p]]$nodata.border.color, 
-				size=att[[p]]$nodata.border.size/2, 
+			geom_polygon(fill='white', 
+				colour='white', 
+				size=0.5, 
 				data=transform(subset(mapDF.all, is.na(pGrp)), pGrp=g))
 	}
 
@@ -78,70 +80,90 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 	#***   each perceptual group and creating datasets which contain all 
 	#***   previous perceptual groups or future groups depending on the 
 	#***   user's shading preference
-	if(att[[p]]$fill.regions=="aggregate"){
+	
+	active.border.color <- 'black'
+	active.border.size <- 1
+
+	inactive.fill <- 'lightgray'
+	inactive.border.color <- gray(.25)
+	inactive.border.size <- 1
+
+	withdata.fill <- 'white'
+	withdata.border.color <- gray(.75)
+	withdata.border.size <- 1
+
+	nodata.fill <- 'white'
+	nodata.border.color <- 'white'
+	nodata.border.size <- 1
+	
+	outer.hull <- FALSE
+	outer.hull.color <- 'black'
+	outer.hull.size <- 1
+	
+	if(fill.regions=="aggregate"){
 		lWith.data <- 1:(nGroups[2]-1)
-		lWith.data <- lWith.data[!lWith.data==att$m.pGrp]
+		lWith.data <- lWith.data[!lWith.data==m.pGrp]
 		lWithout.data <- max(nGroups[1],2):nGroups[2]
-		lWithout.data <- lWithout.data[!lWithout.data==att$m.pGrp]
+		lWithout.data <- lWithout.data[!lWithout.data==m.pGrp]
 
 		for(g in lWith.data) pl <- pl + 
-			geom_polygon(fill=att[[p]]$withdata.fill, 
-				colour=att[[p]]$withdata.border.color, 
-				size=att[[p]]$withdata.border.size/2, 
+			geom_polygon(fill=withdata.fill, 
+				colour=withdata.border.color, 
+				size=withdata.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp>g,], pGrp=g))						
 
 		for(g in lWithout.data) pl <- pl + 
-			geom_polygon(fill=att[[p]]$inactive.fill, 
-				colour=att[[p]]$inactive.border.color,  
-				size=att[[p]]$inactive.border.size/2, 
+			geom_polygon(fill=inactive.fill, 
+				colour=inactive.border.color,  
+				size=inactive.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp<g,], pGrp=g)) 
 
 	 }
  	
-	if(att[[p]]$fill.regions=="two ended"){
-		lGroups <- nGroups[1]:floor(att$m.pGrp)
-		lGroups <- lGroups[!lGroups==att$m.pGrp]
+	if(fill.regions=="two ended"){
+		lGroups <- nGroups[1]:floor(m.pGrp)
+		lGroups <- lGroups[!lGroups==m.pGrp]
 		for(g in lGroups) pl <- pl + 
-			geom_polygon(fill=att[[p]]$withdata.fill, 
-				colour=att[[p]]$withdata.border.color,  
-				size=att[[p]]$withdata.border.size/2, 
+			geom_polygon(fill=withdata.fill, 
+				colour=withdata.border.color,  
+				size=withdata.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp>g,], pGrp=g)) 	
 
-		lGroups <- max(nGroups[1],2):floor(att$m.pGrp)
-		lGroups <- lGroups[!lGroups==att$m.pGrp]
+		lGroups <- max(nGroups[1],2):floor(m.pGrp)
+		lGroups <- lGroups[!lGroups==m.pGrp]
 		for(g in lGroups) pl <- pl + 
-			geom_polygon(fill=att[[p]]$inactive.fill, 
-				colour=att[[p]]$inactive.border.color,  
-				size=att[[p]]$inactive.border.size/2, 
+			geom_polygon(fill=inactive.fill, 
+				colour=inactive.border.color,  
+				size=inactive.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp<g,], pGrp=g)) 	
 
-		lGroups <- ceiling(att$m.pGrp):nGroups[2]
-		lGroups <- lGroups[!lGroups==att$m.pGrp]
+		lGroups <- ceiling(m.pGrp):nGroups[2]
+		lGroups <- lGroups[!lGroups==m.pGrp]
 		for(g in lGroups) pl <- pl + 
-			geom_polygon(fill=att[[p]]$withdata.fill, 
-				colour=att[[p]]$withdata.border.color,  
-				size=att[[p]]$withdata.border.size/2, 
+			geom_polygon(fill=withdata.fill, 
+				colour=withdata.border.color,  
+				size=withdata.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp<g,], pGrp=g)) 
 
-		lGroups <- ceiling(att$m.pGrp):(nGroups[2]-1)
-		lGroups <- lGroups[!lGroups==att$m.pGrp]
+		lGroups <- ceiling(m.pGrp):(nGroups[2]-1)
+		lGroups <- lGroups[!lGroups==m.pGrp]
 		for(g in lGroups) pl <- pl + 
-			geom_polygon(fill=att[[p]]$inactive.fill, 
-				colour=att[[p]]$inactive.border.color,  
-				size=att[[p]]$inactive.border.size/2, 
+			geom_polygon(fill=inactive.fill, 
+				colour=inactive.border.color,  
+				size=inactive.border.size/2, 
 				data=transform(mapDF[mapDF$pGrp>g,], pGrp=g)) 
 
 	 
 	}
 
-	if(att[[p]]$fill.regions=="with data"){
+	if(fill.regions=="with data"){
 		lWith.data <- nGroups[1]:nGroups[2]
-		lWith.data <- lWith.data[!lWith.data==att$m.pGrp]
+		lWith.data <- lWith.data[!lWith.data==m.pGrp]
 
 		for(g in lWith.data) pl <- pl + 
-			geom_polygon(fill=att[[p]]$withdata.fill, 
-				colour=att[[p]]$withdata.border.color,  
-				size=att[[p]]$withdata.border.size/2, 
+			geom_polygon(fill=withdata.fill, 
+				colour=withdata.border.color,  
+				size=withdata.border.size/2, 
 				data=transform(mapDF[!mapDF$pGrp==g,], pGrp=g)) 
 
 	 }
@@ -149,10 +171,10 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 	#*** draw polygons of current perceptual group
 	pl <- pl + 
 		geom_polygon(aes(fill=factor(fill.color)), 
-			colour=att[[p]]$active.border.color, 
-			size=att[[p]]$active.border.size/2, 
+			colour=active.border.color, 
+			size=active.border.size/2, 
 			data=subset(mapDF, hole==0)) + 				
-		scale_fill_manual(values=c(att$colors), guide='none')
+		scale_fill_manual(values=c(colors), guide='none')
   
 	# portrait or landscape
 	if(flip)
@@ -166,25 +188,9 @@ RankMaps <- function(pl, p, mapDF, att, flip){
   #*** Throw an outer hull over the outside
 
 	if(outer.hull==TRUE) for(g in nGroups[1]:nGroups[2]) pl <- pl + geom_polygon(fill=NA,	 
-													colour=att[[p]]$outer.hull.color, 
-													size=att[[p]]$outer.hull.size, 
+													colour=outer.hull.color, 
+													size=outer.hull.size, 
 													data=data.frame(dHull, pGrp=g))
-
-
-	#*** Creates backgroupnd points to correctly align perceptual groups 		
-	bdrCoordsy <- att[[p]]$bdrCoordsy
-	bdrCoordsy <- bdrCoordsy + c(1,-1) * diff(bdrCoordsy)*att$plot.pGrp.spacing
-	bdrCoordsy <- bdrCoordsy + c(0, -1) * diff(range(bdrCoordsy))*.001
-
-	bdrCoordsx <- att[[p]]$bdrCoordsx
-
-	bdrCoords <- data.frame(coordsx=bdrCoordsx, coordsy=bdrCoordsy, pGrp=NA, IDpoly=NA)
-	lGroups <- nGroups[1]:nGroups[2]
-	lGroups <- lGroups[!lGroups==att$m.pGrp]
-	for(g in lGroups) pl <- pl + 
-		geom_point(fill=bgcolor, size=.001,
-				colour=bgcolor, 			
-				data=transform(bdrCoords, pGrp=g))
 
 	# remove everything except plot content
 	pl <- pl + theme(
@@ -198,7 +204,7 @@ RankMaps <- function(pl, p, mapDF, att, flip){
 	  strip.text.x = element_blank(), 
 		strip.text.y = element_blank()
     )
-	
+
 	pl 
 
 }

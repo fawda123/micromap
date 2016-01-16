@@ -2,7 +2,7 @@
 ##### theme settings #####
 ##########################
 
-plt_cln <- function(pl, limsx=NA, limsy=NA, border=TRUE, flip = FALSE){
+plt_cln <- function(pl, limsx = NA, limsy = NA, border = TRUE, flip = FALSE){
 
   ##  
   # flip limits if flip true
@@ -13,7 +13,7 @@ plt_cln <- function(pl, limsx=NA, limsy=NA, border=TRUE, flip = FALSE){
 	 
 	# set axis limits
   xstr.limits <- as.character(paste0('c(',min(limsx), ',', max(limsx),')'))
-	xstr.limits <- paste0("limits =", xstr.limits)
+	xstr.limits <- paste0(", limits =", xstr.limits)
 	xstr <- paste0("scale_x_continuous(", xstr.limits, ')')
 
   ##
