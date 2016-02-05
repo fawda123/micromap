@@ -19,7 +19,7 @@ statePolys <- create_map_table(USstates, IDcolumn="ST")
 ##
 # standard
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "dot","dot", "map"),
+  panel.types=c("labels", "point","point", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=5,
   map.link=c("StateAb","ID"),
@@ -29,7 +29,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # diff grouping
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "dot","dot", "map"),
+  panel.types=c("labels", "point","point", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=17,
   map.link=c("StateAb","ID"),
@@ -39,7 +39,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ## 
 # flipped
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "dot","dot", "map"),
+  panel.types=c("labels", "point","point", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=17,
   map.link=c("StateAb","ID"),
@@ -49,7 +49,7 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # test different panel types
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "dot","bar", "map"),
+  panel.types=c("labels", "bar","bar", "map"),
   panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=5,
   map.link=c("StateAb","ID")

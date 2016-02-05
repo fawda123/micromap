@@ -135,7 +135,7 @@ bar_build <- function(pl, colors = colors, flip = FALSE){
   
   # make plot
   pl <- ggplot(pl)
-
+  
   if(flip){
     
     pl <- pl + 

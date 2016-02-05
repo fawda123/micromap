@@ -8,31 +8,41 @@ plt_cln <- function(pl, limsx = NA, limsy = NA, border = TRUE, flip = FALSE){
   # flip limits if flip true
   if(flip) limsy <- rev(-1 * limsy[1:2])
   
+  # pl geom class
+  pl_cl <- class(pl$layers[[1]]$geom)[1]
+  
   ##
-  # xaxis 
+  # axes 
 	 
 	# set axis limits
   xstr.limits <- as.character(paste0('c(',min(limsx), ',', max(limsx),')'))
-	xstr.limits <- paste0(", limits =", xstr.limits)
-	xstr <- paste0("scale_x_continuous(", xstr.limits, ')')
-
-  ##
-	# yaxis 
-
+	xstr.limits <- paste0(", xlim =", xstr.limits)
 	ystr.limits <- as.character(paste('c(',min(limsy), ',', max(limsy),')'))
-	ystr.limits <- paste(", limits=", ystr.limits)
-	ystr <- paste("scale_y_continuous(", ystr.limits, ')')
+	ystr.limits <- paste(", ylim=", ystr.limits)
 
+	txt <- 'cartesian'
 	if(flip){
-	  xstr <- gsub('_x_', '_y_', xstr)
-	  ystr <- gsub('_y_', '_x_', ystr)
+	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
+	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
 	}
 	
+	if(flip & pl_cl == 'GeomBar'){
+	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
+	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
+	}
+	
+	if(!flip & pl_cl == 'GeomBar'){
+	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
+	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
+	  txt <- 'flip'
+	}
+	toeval <- paste0('coord_', txt, '(', xstr.limits, ystr.limits, ')')
+  
 	##
 	# set limits
+
   pl <- pl +
-    eval(parse(text = ystr)) + 
-    eval(parse(text = xstr))
+    eval(parse(text = toeval))
   
   ##
   # border
