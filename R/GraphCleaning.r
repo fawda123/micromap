@@ -2,48 +2,8 @@
 ##### theme settings #####
 ##########################
 
-plt_cln <- function(pl, limsx = NA, limsy = NA, border = TRUE, flip = FALSE){
+plt_cln <- function(pl, border = TRUE, flip = FALSE){
 
-  ##  
-  # flip limits if flip true
-  if(flip) limsy <- rev(-1 * limsy[1:2])
-  
-  # pl geom class
-  pl_cl <- class(pl$layers[[1]]$geom)[1]
-  
-  ##
-  # axes 
-	 
-	# set axis limits
-  xstr.limits <- as.character(paste0('c(',min(limsx), ',', max(limsx),')'))
-	xstr.limits <- paste0(", xlim =", xstr.limits)
-	ystr.limits <- as.character(paste('c(',min(limsy), ',', max(limsy),')'))
-	ystr.limits <- paste(", ylim=", ystr.limits)
-
-	txt <- 'cartesian'
-	if(flip){
-	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
-	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
-	}
-	
-	if(flip & pl_cl == 'GeomBar'){
-	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
-	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
-	}
-	
-	if(!flip & pl_cl == 'GeomBar'){
-	  xstr.limits <- gsub('xlim', 'ylim', xstr.limits)
-	  ystr.limits <- gsub('ylim', 'xlim', ystr.limits)
-	  txt <- 'flip'
-	}
-	toeval <- paste0('coord_', txt, '(', xstr.limits, ystr.limits, ')')
-  
-	##
-	# set limits
-
-  pl <- pl +
-    eval(parse(text = toeval))
-  
   ##
   # border
   

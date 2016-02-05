@@ -190,14 +190,16 @@ mmplot.default <- function(map.data,
     # labels
     if(panel.types[p] == 'labels'){
       
-      plots[[p]] <- eval(parse(text = paste(panel.types[p], '_build(DF, panel.data[[p]], align = text.align, flip = flip)',sep = '')))
+      txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], align = text.align, flip = flip)')
+      plots[[p]] <- eval(parse(text = txt))
       
     }
   
-    # other
-    if(!panel.types[p] %in% c('map', 'labels')){
-
-	    plots[[p]] <- eval(parse(text = paste('pan_build(', '"', panel.types[p], '", DF, panel.data[[p]], colors = colors, flip = flip)',sep = '')))
+    # others
+    if(panel.types[p] %in% c('bar', 'jitter', 'label', 'line', 'point', 'step', 'text')){
+      
+      txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], colors = colors, flip = flip)')
+	    plots[[p]] <- eval(parse(text = txt))
      
     }		
 

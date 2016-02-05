@@ -1,8 +1,6 @@
 ##
 # to do 
 #
-# figure out how to deal with coord flip in bar plots, can this be ided in axis_opts and dealt with if statement (line 214)?
-#        https://github.com/hadley/ggplot2/issues/647
 # continue generic ggplot2 infrastructure
 # conf limits for plots if appropriate
 

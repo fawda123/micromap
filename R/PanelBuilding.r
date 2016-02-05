@@ -6,8 +6,8 @@ labels_build <- function(DF, align, labels, flip = FALSE){
 	#** With the way the defaults are set up. default text size needs to be doubled
 	tmp.tsize <- 4
 	DF$tmp.y <- DF$pGrpOrd*tmp.tsize
-	tmp.limsy <- c((min(-DF$pGrpOrd) - .5) * tmp.tsize, 
-			(max(-DF$pGrpOrd) + .5) * tmp.tsize)
+	tmp.limsy <- c((min(-DF$pGrpOrd)) * tmp.tsize, 
+			(max(-DF$pGrpOrd)) * tmp.tsize)
 
 	DF$labels <- DF[, labels]
 	mln <- max(nchar(as.character(DF[, labels])))
@@ -70,91 +70,267 @@ labels_build <- function(DF, align, labels, flip = FALSE){
 
 }
 
-#' generic panel function
-#' 
-#' @param ptype chr string for panel type corresponding to ggplot geom, e.g., point, bar, line, etc.
-#' @param DF data.frame of actual data
-#' @param dat chr string indicating column in DF for data to plot
-#' @param colors chr string of colors for the perceptual groups
-#' @param flip logical if portrait or landscape
-pan_build <- function(ptype, DF, dat, colors = colors, flip = FALSE){
 
-  # stop if panel type does not exist
-  if(!ptype %in% c('point', 'bar'))
-    stop(paste0("unknown panel type -- '", ptype, "'", sep = ''))
-
+#'
+bar_build <- function(DF, dat, colors = colors, flip = FALSE){ 
+  
   # subset data to plot
   xvar <- dat
   toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
   names(toplo)[names(toplo) %in% dat] <- 'xvar'
-
-  # padding for pgrps by facet
-  tmp.limsx <- range(DF[, dat], na.rm=T)
-	tmp.limsx <- tmp.limsx + c(-1,1) * diff(tmp.limsx)*.05
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-	if(diff(tmp.limsx)==0) tmp.limsx <- tmp.limsx + c(-.5,.5)
   
   # make plot
-  pl <- eval(parse(text = paste(ptype, '_build(toplo, colors = colors, flip = flip)',sep = '')))
+  pl <- ggplot(toplo)
 
-  # clean up plot
-	pl <- plt_cln(pl, limsx=tmp.limsx, limsy=tmp.limsy, flip = flip)
-	
-	return(pl) 
-	
-}
-
-#'
-point_build <- function(pl, colors = colors, flip = FALSE){ 
- 
-  # make plot
-  pl <- ggplot(pl)
-
-  if(flip){
-    
-    pl <- pl + 
-  		geom_point(aes(x = pGrpOrd, y = xvar, colour = factor(color))) +
-  	  facet_grid(.~pGrp) + 
-  		scale_colour_manual(values=colors, guide='none')   
-    
-  } else {
-    
-    pl <- pl +   
-      geom_point(aes(x=xvar, y=-pGrpOrd, colour=factor(color))) +
-  	  facet_grid(pGrp~.) + 
-  		scale_colour_manual(values=colors, guide='none') 
-    
-  }
-  
-  return(pl)
-	
-}
-
-#'
-bar_build <- function(pl, colors = colors, flip = FALSE){ 
-  
-  # make plot
-  pl <- ggplot(pl)
-  
   if(flip){
     
     pl <- pl + 
   		geom_bar(aes(x = pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') +
-  	  facet_grid(.~pGrp) +
-  		scale_fill_manual(values=colors, guide='none')   
+  	  facet_grid(.~pGrp)
     
   } else {
     
     pl <- pl +   
       geom_bar(aes(x = -pGrpOrd, y = xvar, fill = factor(color)), stat = 'identity') + 
   	  coord_flip() + 
-      facet_grid(pGrp~.) +
-  		scale_fill_manual(values=colors, guide='none') 
+      facet_grid(pGrp~.) 
     
   }
   
-  return(pl)
+  #final plot
+  pl <- pl + 
+    scale_fill_manual(values=colors, guide='none') 
+    
+  pl <- plt_cln(pl, flip = flip)
 
+  return(pl)  	
+  
+}
+
+#'
+jitter_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_jitter(aes(x = pGrpOrd, y = xvar, colour = factor(color), fill = factor(color))) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_jitter(aes(x=xvar, y=-pGrpOrd, colour=factor(color), fill = factor(color))) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # final plot
+  pl <- pl + 
+    scale_colour_manual(values = colors, guide = 'none') + 
+    scale_fill_manual(values = colors, guide = 'none')
+    theme(legend.position = 'none')
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
+label_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_label(aes(x = pGrpOrd, y = xvar, label = xvar, colour = factor(color))) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_label(aes(x=xvar, y=-pGrpOrd, label = xvar, colour=factor(color))) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # final plot
+  pl <- pl + 
+    scale_colour_manual(values = colors, guide = 'none') + 
+    theme(legend.position = 'none')
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#' geom_point builder
+#' 
+#' @param ptype chr string for panel type corresponding to ggplot geom, e.g., point, bar, line, etc.
+#' @param DF data.frame of actual data
+#' @param dat chr string indicating column in DF for data to plot
+#' @param colors chr string of colors for the perceptual groups
+#' @param flip logical if portrait or landscape
+point_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_point(aes(x = pGrpOrd, y = xvar, colour = factor(color), fill = factor(color))) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_point(aes(x=xvar, y=-pGrpOrd, colour=factor(color), fill = factor(color))) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # final plot
+  pl <- pl + 
+    scale_colour_manual(values = colors, guide = 'none') + 
+    scale_fill_manual(values = colors, guide = 'none')
+    theme(legend.position = 'none')
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#' 
+line_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_line(aes(x = pGrpOrd, y = xvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_line(aes(x=xvar, y=-pGrpOrd)) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#' 
+step_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_step(aes(x = pGrpOrd, y = xvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_step(aes(x=xvar, y=-pGrpOrd)) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
+text_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat
+  toplo <- DF[, c(xvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat] <- 'xvar'
+
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_text(aes(x = pGrpOrd, y = xvar, label = xvar, colour = factor(color))) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_text(aes(x=xvar, y=-pGrpOrd, label = xvar, colour=factor(color))) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # final plot
+  pl <- pl + 
+    scale_colour_manual(values = colors, guide = 'none') + 
+    theme(legend.position = 'none')
+  
+  # clean it up
+  pl <- plt_cln(pl, flip = flip)
+
+  # clean up plot
+	return(pl) 
+	
 }
 
 ######
