@@ -19,16 +19,6 @@ statePolys <- create_map_table(USstates, IDcolumn="ST")
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "point","point", "map"),
   panel.data=list("state","pov","ed", NA),
-  ord.by="pov", grouping=5,
-  map.link=c("StateAb","ID"),
-  flip = F
-)
-
-##
-# diff grouping
-mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "point","point", "map"),
-  panel.data=list("state","pov","ed", NA),
   ord.by="pov", grouping=17,
   map.link=c("StateAb","ID"),
   flip = F
@@ -45,12 +35,40 @@ mmplot(stat.data=edPov, map.data=statePolys,
 )
 
 ##
-# test different panel types
+# test different panel types 1
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "bar","bar", "map"),
   panel.data=list("state","pov","ed", NA),
-  ord.by="pov", grouping=5,
+  ord.by="pov", grouping=17,
   map.link=c("StateAb","ID")
+)
+
+##
+# test different panel types 2
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "jitter","text", "map"),
+  panel.data=list("state","pov","ed", NA),
+  ord.by="pov", grouping=17,
+  map.link=c("StateAb","ID")
+)
+
+##
+# test different panel types 3
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "label","step", "map"),
+  panel.data=list("state","pov","ed", NA),
+  ord.by="pov", grouping=17,
+  map.link=c("StateAb","ID")
+)
+
+##
+# test different panel types 4
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "line","point", "map"),
+  panel.data=list("state","pov","ed", NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID"),
+  flip = F
 )
 
 ##

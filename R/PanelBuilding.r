@@ -243,14 +243,15 @@ line_build <- function(DF, dat, colors = colors, flip = FALSE){
   if(flip){
     
     pl <- pl + 
-      geom_line(aes(x = pGrpOrd, y = xvar)) + 
-      facet_grid(.~pGrp)
+  		geom_line(aes(x = pGrpOrd, y = xvar)) +
+  	  facet_grid(.~pGrp)
     
   } else {
     
-    pl <- pl +
-      geom_line(aes(x=xvar, y=-pGrpOrd)) + 
-      facet_grid(pGrp~.)
+    pl <- pl +   
+      geom_line(aes(x = -pGrpOrd, y = xvar)) + 
+  	  coord_flip() + 
+      facet_grid(pGrp~.) 
     
   }
   
@@ -276,14 +277,15 @@ step_build <- function(DF, dat, colors = colors, flip = FALSE){
   if(flip){
     
     pl <- pl + 
-      geom_step(aes(x = pGrpOrd, y = xvar)) + 
-      facet_grid(.~pGrp)
+  		geom_step(aes(x = pGrpOrd, y = xvar)) +
+  	  facet_grid(.~pGrp)
     
   } else {
     
-    pl <- pl +
-      geom_step(aes(x=xvar, y=-pGrpOrd)) + 
-      facet_grid(pGrp~.)
+    pl <- pl +   
+      geom_step(aes(x = -pGrpOrd, y = xvar)) + 
+  	  coord_flip() + 
+      facet_grid(pGrp~.) 
     
   }
   
