@@ -188,7 +188,7 @@ mmplot.default <- function(map.data,
     # categorical plot types
     if(length(panel.data[[p]]) == 1){
       
-      pltypes <- c('bar', 'jitter', 'label', 'line', 'point', 'step', 'text')
+      pltypes <- c('bar', 'jitter', 'label', 'line', 'point', 'step', 'text', 'dot_legend')
       
       # check correct panel type for one variable
       if(!any(panel.types[p] %in% c('map', 'labels', pltypes))){

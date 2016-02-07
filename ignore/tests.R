@@ -5,6 +5,7 @@
 #  make sure I have all categorical geoms (points,bars, etc.)
 #  start with bivariate plots - xy scatters, hists, etc.
 #  mmgrouped plot - lots to do with this (boxplots, etc.)
+# dimensions of combined plots if dot_legend is used
 # conf limits for plots if appropriate
 # plot aesthetics - look at how maggrittr does it
 
@@ -68,8 +69,8 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # test different panel types 4
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "point", "map"),
-  panel.data=list("state", c("pov", "ed"), NA),
+  panel.types=c("labels", "dot_legend", "point", "map"),
+  panel.data=list("state", NA, c("pov", "ed"), NA),
   ord.by="ed", grouping=17,
   map.link=c("StateAb","ID"),
   flip = T

@@ -61,7 +61,7 @@ plt_cln <- function(pl, border = TRUE, flip = FALSE, biv = FALSE){
 # limsy ylimits
 # flip logical if flip is true
 gen_cln <- function(pl, limsx, limsy, flip){
-  
+
   ##  
   # flip limits if flip true
   if(flip) limsy <- rev(-1 * limsy[1:2])

@@ -70,6 +70,40 @@ labels_build <- function(DF, align, labels, flip = FALSE){
 
 }
 
+#' 
+dot_legend_build <- function(DF, p, colors, flip = FALSE){ 
+	
+  # housekeeping
+	DF$tmp.data <- rep(0, nrow(DF))
+  ncolors <- length(colors)
+	limsy <- c(min(-DF$pGrpOrd), max(-DF$pGrpOrd))
+  limsx <- c(0, 0)
+  
+  # create plots
+	pl <- ggplot(DF) 
+
+	if(flip){
+	  
+	  pl <- pl + 
+		  geom_point(aes(x=pGrpOrd, y = tmp.data, colour=factor(color))) +
+	       	facet_grid(. ~ pGrp)
+	
+  } else {
+    
+	  pl <- pl + 
+		  geom_point(aes(x=tmp.data, y=-pGrpOrd, colour=factor(color))) +
+	       	facet_grid(pGrp~.)
+	  
+  }
+	
+	#final plot
+  pl <- pl + 
+    scale_colour_manual(values=colors, guide='none') 
+	
+  pl <- gen_cln(pl, limsx = limsx, limsy = limsy, flip = flip)
+	pl
+	
+}
 
 #'
 bar_build <- function(DF, dat, colors = colors, flip = FALSE){ 
@@ -229,7 +263,7 @@ point_build <- function(DF, dat, colors = colors, flip = FALSE){
 	
 }
 
-#'
+#' for bivariate plots
 point2_build <- function(DF, dat, colors = colors, flip = FALSE){
 
   # subset data to plot
@@ -415,39 +449,6 @@ ranks_build <- function(pl, p, DF, att, flip = FALSE){
 
 	pl
 	
-}
-
-#' 
-dot_legend_build <- function(pl, p, DF, att, flip = FALSE){ 
-	DF$tmp.data <- rep(0, nrow(DF))
-
-	tmp.limsy <- -(range(DF$pGrpOrd) + c(-1,1) * .5)
-	tmp.limsx <- c(-.5,.5)
-
-	ncolors <- length(att$colors)
-
-	  #################################
-	  #################################
-
-
-	pl <- ggplot(DF) 
-
-	if(att[[p]]$point.border) pl <- pl + geom_point(aes(x=tmp.data, y=-pGrpOrd), 
-									colour='black',
-									size=att[[p]]$point.size*2.5, 
-									pch=att[[p]]$point.type)
-
-	pl <- pl + 
-		geom_point(aes(x=tmp.data, y=-pGrpOrd, colour=factor(color)), 
-				size=att[[p]]$point.size*2, pch=att[[p]]$point.type) +
-	     	facet_grid(pGrp~., scales="free_y", space="free") +
-		scale_colour_manual(values=att$colors, guide='none') 
-
-	pl <- plot_opts(p, pl, att)		
-	pl <- graph_opts(p, pl, att)		
-	pl <- axis_opts(p, pl, att, limsx=tmp.limsx, limsy=tmp.limsy)
-
-	pl
 }
 
 #'
