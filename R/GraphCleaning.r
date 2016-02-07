@@ -1,8 +1,15 @@
 ##########################
 ##### theme settings #####
 ##########################
-
-plt_cln <- function(pl, border = TRUE, flip = FALSE){
+#' Clean a raw ggplot2 plot
+#'
+#' Clean a raw ggplot2 plot
+#'
+#' @param pl Input ggplot2 object
+#' @param border logical if border around plot is created
+#' @param flip logical if portrait or landscape
+#' @param biv logical if plot is bivariate or not
+plt_cln <- function(pl, border = TRUE, flip = FALSE, biv = FALSE){
 
   ##
   # border
@@ -31,14 +38,16 @@ plt_cln <- function(pl, border = TRUE, flip = FALSE){
       axis.title = element_blank()
     )
   
-  if(flip){
+  if(!biv){
+    if(flip){
     
-    pl <- pl + theme(axis.text.x = element_blank())
+      pl <- pl + theme(axis.text.x = element_blank())
     
-  } else {
+    } else {
    
-    pl <- pl+ theme(axis.text.y = element_blank()) 
+      pl <- pl+ theme(axis.text.y = element_blank()) 
     
+    }
   }
   
 	pl

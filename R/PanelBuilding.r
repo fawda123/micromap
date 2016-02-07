@@ -229,6 +229,47 @@ point_build <- function(DF, dat, colors = colors, flip = FALSE){
 	
 }
 
+#'
+point2_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+  
+  if(flip){
+    
+    pl <- pl + 
+      geom_point(aes(x = xvar, y = yvar, colour = factor(color), fill = factor(color))) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_point(aes(x=xvar, y=yvar, colour=factor(color), fill = factor(color))) + 
+      facet_grid(pGrp~.)
+    
+  }
+  
+  # final plot
+  pl <- pl + 
+    scale_colour_manual(values = colors, guide = 'none') + 
+    scale_fill_manual(values = colors, guide = 'none')
+    theme(legend.position = 'none')
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
 #' 
 line_build <- function(DF, dat, colors = colors, flip = FALSE){
 

@@ -68,8 +68,8 @@ mmplot(stat.data=edPov, map.data=statePolys,
 ##
 # test different panel types 4
 mmplot(stat.data=edPov, map.data=statePolys,
-  panel.types=c("labels", "bar","point", "map"),
-  panel.data=list("state","pov","ed", NA),
+  panel.types=c("labels", "point", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
   ord.by="ed", grouping=17,
   map.link=c("StateAb","ID"),
   flip = T

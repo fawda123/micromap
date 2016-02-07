@@ -112,7 +112,12 @@ mmplot.default <- function(map.data,
   fill.regions = 'aggregate', 
   text.align = 'right'
 ){		
-  
+
+  # sanity checks
+  chk_len <- lapply(panel.data, length)
+  if(any(unlist(chk_len) > 2))
+    stop('No more than two variables per list element in panel.data')
+
   # rename function inputs
   dStats <- stat.data
   dMap <- map.data
@@ -180,29 +185,59 @@ mmplot.default <- function(map.data,
   # each section builds a plot object of the specified type
   for(p in 1:nPanels){	
   
-    # maps
-    if(panel.types[p] == 'map'){
-
-	    plots[[p]]  <- RankMaps(plots[[p]], mapDF, colors = colors, flip = flip, fill.regions = fill.regions)
-
-    } 
-  
-    # labels
-    if(panel.types[p] == 'labels'){
+    # categorical plot types
+    if(length(panel.data[[p]]) == 1){
       
-      txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], align = text.align, flip = flip)')
-      plots[[p]] <- eval(parse(text = txt))
+      pltypes <- c('bar', 'jitter', 'label', 'line', 'point', 'step', 'text')
+      
+      # check correct panel type for one variable
+      if(!any(panel.types[p] %in% c('map', 'labels', pltypes))){
+        txt <- paste('Incorrect panel.type for panel.data:', panel.types[p], 'for', panel.data[[p]])
+        stop(txt)
+      }
+      
+      # maps
+      if(panel.types[p] == 'map'){
+  
+  	    plots[[p]]  <- RankMaps(plots[[p]], mapDF, colors = colors, flip = flip, fill.regions = fill.regions)
+  
+      } 
+    
+      # labels
+      if(panel.types[p] == 'labels'){
+        
+        txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], align = text.align, flip = flip)')
+        plots[[p]] <- eval(parse(text = txt))
+        
+      }
+      
+      # others
+      if(panel.types[p] %in% c(pltypes)){
+        
+        txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], colors = colors, flip = flip)')
+  	    plots[[p]] <- eval(parse(text = txt))
+       
+      }	
       
     }
-  
-    # others
-    if(panel.types[p] %in% c('bar', 'jitter', 'label', 'line', 'point', 'step', 'text')){
+    
+    # bivariate plot types
+    if(length(panel.data[[p]]) == 2){
       
-      txt <- paste0(panel.types[p], '_build(DF, panel.data[[p]], colors = colors, flip = flip)')
-	    plots[[p]] <- eval(parse(text = txt))
-     
-    }		
+      pltypes <- c('bin2d', 'contour', 'count', 'density_2d', 'hex', 'path', 'point', 'raster')
+      
+      # check correct panel type for one variable
+      if(!any(panel.types[p] %in% pltypes)){
+        txt <- paste('Incorrect panel.type for panel.data:', panel.types[p], 'for', panel.data[[p]])
+        stop(txt)
+      }
+      ptypes <- gsub('^point$', 'point2', panel.types)
 
+      # create the plot
+      txt <- paste0(ptypes[p], '_build(DF, panel.data[[p]], colors = colors, flip = flip)')
+  	  plots[[p]] <- eval(parse(text = txt))
+      
+    }
   }
   
   ##############################
