@@ -253,7 +253,7 @@ mmplot.default <- function(map.data,
   plots <- eval(parse(text = toeval))
 
   # plot with some spacing around margins
-  grid.arrange(plots, vp =  viewport(height=unit(0.95, "npc"), width=unit(0.95, "npc")))
+  grid.arrange(plots, vp = viewport(height=unit(0.95, "npc"), width=unit(0.95, "npc")))
     
 } 
 

@@ -5,7 +5,9 @@
 #  make sure I have all categorical geoms (points,bars, etc.)
 #  start with bivariate plots - xy scatters, hists, etc.
 #  mmgrouped plot - lots to do with this (boxplots, etc.)
-# dimensions of combined plots if dot_legend is used
+# dimensions of combined plots if dot_legend is used 
+#  it has something to do with grob heights e.g. before rbind/cbind of gtables at bottom of mmplot
+#  do somethign like this   plots[[3]]$heights[2:3] <- unit(c(-1, -1), 'cm')
 # conf limits for plots if appropriate
 # plot aesthetics - look at how maggrittr does it
 
