@@ -92,15 +92,15 @@ mmplot.SpatialPolygonsDataFrame <- function(map.data, ...){
   map.link <- c('ID', 'ID')
   
   # use default method
-  mmplot.default(map.data, stat.data, map.link = map.link, ...)
+  mmplot.default(stat.data, map.data, map.link = map.link, ...)
   
 }
 
 #' @rdname mmplot
 #' 
 #' @method mmplot default
-mmplot.default <- function(map.data, 
-  stat.data, 
+mmplot.default <- function(stat.data,
+  map.data,
   panel.types, 
   panel.data, 		
   map.link,				
@@ -112,12 +112,27 @@ mmplot.default <- function(map.data,
   fill.regions = 'aggregate', 
   text.align = 'right'
 ){		
-
+  
   # sanity checks
   chk_len <- lapply(panel.data, length)
   if(any(unlist(chk_len) > 2))
     stop('No more than two variables per list element in panel.data')
 
+  # check if data need to be aggregated for group comparisons
+  statlnk <- stat.data[, map.link[1]]
+  if(length(unique(statlnk)) <  length(statlnk)){
+    
+    browser()
+    
+    tmp <- tidyr::gather(edPov, 'Category', 'value')
+
+    tmp <- unionSpatialPolygons(USstates, IDs = USstates@data$region)
+    dat <- data.frame(region = row.names(tmp), stringsAsFactors =  FALSE)
+    row.names(dat) <- row.names(tmp)
+    tmp <- SpatialPolygonsDataFrame(tmp, dat)
+    
+  }
+  
   # rename function inputs
   dStats <- stat.data
   dMap <- map.data

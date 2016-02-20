@@ -18,6 +18,11 @@
 
 # three dimensional relationships (requires a z variable) - geom_contour, geom_tile, geom_raster, geom_rect
 
+
+
+## mmplot with grouping variables, see ex below and lines 121 in mmplot
+# need to reorganize data in long format
+
 ##
 # some tests
 
@@ -151,6 +156,23 @@ mmplot(stat.data=edPov, map.data=statePolys,
 
 ##
 # mmgroupedplot
+# not really but try this with mmplot
+
+data(regionPolys)
+create_map_table(regionPolys, ID= 'region')
+data(edPov)
+
+mmplot(stat.data=edPov, map.data=regionPolys,
+  panel.types=c("labels", "bar", "map"),
+  panel.data=list("region", c("pov", "ed"), NA),
+  ord.by="ed", grouping=NULL,
+  map.link=c("region", "region"),
+  flip = T
+)
+
+
+
+
 
 data("WSA3")
 wsa.polys<-create_map_table(WSA3)
@@ -162,16 +184,12 @@ data("vegCov")
 
 ## 
 # points and dot_legend
-mmplot(stat.data=vegCov, map.data=wsa.polys,
-  panel.types=c("map", "labels", "bar", "bar"),
-  panel.data=list(NA, "Category", 'Estimate.P', 'Estimate.U'),
+mmplot(stat.data = vegCov, map.data = wsa.polys,
+  panel.types=c("map", , "bar"),
+  panel.data=list(NA, "Category", '', 'Estimate.U'),
   ord.by="ed", grouping=17,
-  map.link=c("Subpopulation", "ID"),
-  cat = "Category"
+  map.link=c("Subpopulation", "ID")
 )
-
-
-
 
 # standard plot, ok
 mmgroupedplot(stat.data=vegCov,
