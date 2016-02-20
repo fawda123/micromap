@@ -114,6 +114,80 @@ vignette(package = &#39;micromap&#39;)
 
 # open vignette
 vignette(&#39;Introduction_Guide&#39;)</code></pre>
+<p>The following provides minimal working examples to illustrate functionality provided by the micromap package.</p>
+<pre class="r"><code># stat data, data.frame
+data(&#39;edPov&#39;)
+
+# map data
+data(&quot;USstates&quot;) 
+statePolys &lt;- create_map_table(USstates, IDcolumn=&quot;ST&quot;) 
+
+##
+# standard
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c(&quot;labels&quot;, &quot;point&quot;,&quot;point&quot;, &quot;map&quot;),
+  panel.data=list(&quot;state&quot;,&quot;pov&quot;,&quot;ed&quot;, NA),
+  ord.by=&quot;pov&quot;, grouping=17,
+  map.link=c(&quot;StateAb&quot;,&quot;ID&quot;),
+  flip = F
+)</code></pre>
+<p><img src="README_files/figure-html/unnamed-chunk-6-1.png" /></p>
+<p>The updated version of the micromap package includes additional ggplot2 geoms for plotting. The use of appropriate geoms depends on the type of data relationships that can be displayed. The two most common data relationships are nominal data, such as values by categories, or bivariate relationships, such as standard x/y variable plots. The geoms in ggplot2 that can be used with micromap are specified in the <code>panel.types</code> argument in the <code>mmplot</code> or <code>mmgroupedplot</code> functions, e.g., <code>panel.types = c('labels', 'geom_point', 'geom_bar', 'map')</code>. The geom can be specified as a character string by the full geom or by ommitting the <code>'geom_'</code> text, i.e., <code>'geom_point'</code> or <code>'point'</code>.</p>
+<p>Appropriate geoms for nominal data relationships include:</p>
+<ul>
+<li><code>geom_point</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-7-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_bar</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-8-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_jitter</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-9-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_label</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_line</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_step</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-12-1.png" title="" alt="" width="500px" /></p>
+<ul>
+<li><code>geom_text</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-13-1.png" title="" alt="" width="500px" /></p>
+<p>Bivariate plotting in the micromap package is possible by addiing additional variable names to the <code>panel.data</code> argument and using an appropriate geom in the <code>panel.types</code> argument. For example, <code>panel.types=c(&quot;labels&quot;, &quot;point&quot;, &quot;map&quot;)</code> and <code>panel.data = list(&quot;state&quot;, c(&quot;pov&quot;, &quot;ed&quot;), NA)</code> will produce a scatterplot of poverty (x) by education (y).</p>
+<p>Appropriate geoms for bivariate relationships include:</p>
+<ul>
+<li><code>geom_point</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-14-1.png" title="" alt="" width="450px" /></p>
+<ul>
+<li><code>geom_bin2d</code> number of observations defined by bins in two-dimensions</li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-15-1.png" title="" alt="" width="450px" /></p>
+<ul>
+<li><code>geom_count</code> number or proportion of observations defined by all combinations in two-dimensions</li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-16-1.png" title="" alt="" width="450px" /></p>
+<ul>
+<li><code>geom_density_2d</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-17-1.png" title="" alt="" width="450px" /></p>
+<ul>
+<li><code>geom_hex</code> Same as <code>bin2d</code> but two-dimensional locations are shown as hexagons</li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-18-1.png" title="" alt="" width="450px" /></p>
+<ul>
+<li><code>geom_path</code></li>
+</ul>
+<p><img src="README_files/figure-html/unnamed-chunk-19-1.png" title="" alt="" width="450px" /></p>
 </div>
 <div id="epa-disclaimer" class="section level3">
 <h3>EPA Disclaimer</h3>
@@ -123,12 +197,6 @@ vignette(&#39;Introduction_Guide&#39;)</code></pre>
 <div id="license" class="section level3">
 <h3>License</h3>
 <p>This project is licensed under the GNU General Public License, <a href="http://cran.r-project.org/web/licenses/GPL-2">GPL-2</a>.</p>
-</div>
-<div id="issues" class="section level3">
-<h3>Issues</h3>
-<ul>
-<li>fixed aspect ratio of maps - this is a gtable issue? see <a href="https://github.com/hadley/gtable/issues/51">here</a> and <a href="http://stackoverflow.com/questions/34686539/gtable-rbind-cbind-with-fixed-coordinates">here</a></li>
-</ul>
 </div>
 </div>
 

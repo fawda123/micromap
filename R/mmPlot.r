@@ -122,6 +122,9 @@ mmplot.default <- function(map.data,
   dStats <- stat.data
   dMap <- map.data
 
+  # remove 'geom' prefix if in panel.types
+  panel.types <- gsub('geom_', '', panel.types)
+  
   # get plot colors
   colors = colorRampPalette(colors)(grouping)
 

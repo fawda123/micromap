@@ -142,6 +142,166 @@ bar_build <- function(DF, dat, colors = colors, flip = FALSE){
 }
 
 #'
+bin2d_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+
+  if(flip){
+    
+    pl <- pl + 
+      geom_bin2d(aes(x = xvar, y = yvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_bin2d(aes(x=xvar, y=yvar)) + 
+      facet_grid(pGrp~.)
+    
+  }
+
+  # final plot
+  pl <- pl + 
+    theme(legend.position = 'none') + 
+    scale_fill_gradientn(colours = colors)
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
+count_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+
+  if(flip){
+    
+    pl <- pl + 
+      geom_count(aes(x = xvar, y = yvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_count(aes(x=xvar, y=yvar)) + 
+      facet_grid(pGrp~.)
+    
+  }
+
+  # final plot
+  pl <- pl + 
+    theme(legend.position = 'none') + 
+    scale_fill_gradientn(colours = colors)
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
+density_2d_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+
+  if(flip){
+    
+    pl <- pl + 
+      geom_density_2d(aes(x = xvar, y = yvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_density_2d(aes(x=xvar, y=yvar)) + 
+      facet_grid(pGrp~.)
+    
+  }
+
+  # final plot
+  pl <- pl + 
+    theme(legend.position = 'none') + 
+    scale_colour_gradientn(colours = colors)
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
+hex_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+
+  if(flip){
+    
+    pl <- pl + 
+      geom_hex(aes(x = xvar, y = yvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_hex(aes(x=xvar, y=yvar)) + 
+      facet_grid(pGrp~.)
+    
+  }
+
+  # final plot
+  pl <- pl + 
+    theme(legend.position = 'none') + 
+    scale_fill_gradientn(colours = colors)
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
+#'
 jitter_build <- function(DF, dat, colors = colors, flip = FALSE){
 
   # subset data to plot
@@ -217,6 +377,47 @@ label_build <- function(DF, dat, colors = colors, flip = FALSE){
 	return(pl) 
 	
 }
+
+#'
+path_build <- function(DF, dat, colors = colors, flip = FALSE){
+
+  # subset data to plot
+  xvar <- dat[1]
+  yvar <- dat[2]
+  toplo <- DF[, c(xvar, yvar, 'pGrp', 'pGrpOrd', 'color')]
+  names(toplo)[names(toplo) %in% dat[1]] <- 'xvar'
+  names(toplo)[names(toplo) %in% dat[2]] <- 'yvar'
+    
+  # make plot
+  pl <- ggplot(toplo)
+
+  if(flip){
+    
+    pl <- pl + 
+      geom_path(aes(x = xvar, y = yvar)) + 
+      facet_grid(.~pGrp)
+    
+  } else {
+    
+    pl <- pl +
+      geom_path(aes(x=xvar, y=yvar)) + 
+      facet_grid(pGrp~.)
+    
+  }
+
+  # final plot
+  pl <- pl + 
+    theme(legend.position = 'none') + 
+    scale_colour_gradientn(colours = colors)
+
+  # clean it up
+  pl <- plt_cln(pl, flip = flip, biv = TRUE)
+
+  # clean up plot
+	return(pl) 
+	
+}
+
 
 #' geom_point builder
 #' 

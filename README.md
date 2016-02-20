@@ -72,6 +72,91 @@ vignette(package = 'micromap')
 vignette('Introduction_Guide')
 ```
 
+The following provides minimal working examples to illustrate functionality provided by the micromap package.
+
+
+
+```r
+# stat data, data.frame
+data('edPov')
+
+# map data
+data("USstates") 
+statePolys <- create_map_table(USstates, IDcolumn="ST") 
+
+##
+# standard
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "point","point", "map"),
+  panel.data=list("state","pov","ed", NA),
+  ord.by="pov", grouping=17,
+  map.link=c("StateAb","ID"),
+  flip = F
+)
+```
+
+![](README_files/figure-html/unnamed-chunk-6-1.png)
+
+The updated version of the micromap package includes additional ggplot2 geoms for plotting.  The use of appropriate geoms depends on the type of data relationships that can be displayed.  The two most common data relationships are nominal data, such as values by categories, or bivariate relationships, such as standard x/y variable plots.  The geoms in ggplot2 that can be used with micromap are specified in the `panel.types` argument in the `mmplot` or `mmgroupedplot` functions, e.g., `panel.types = c('labels', 'geom_point', 'geom_bar', 'map')`.  The geom can be specified as a character string by the full geom or by ommitting the `'geom_'` text, i.e., `'geom_point'` or `'point'`.
+
+Appropriate geoms for nominal data relationships include:
+
+* `geom_point`
+
+<img src="README_files/figure-html/unnamed-chunk-7-1.png" title="" alt="" width="500px" />
+
+* `geom_bar`
+
+<img src="README_files/figure-html/unnamed-chunk-8-1.png" title="" alt="" width="500px" />
+
+* `geom_jitter`
+
+<img src="README_files/figure-html/unnamed-chunk-9-1.png" title="" alt="" width="500px" />
+
+* `geom_label`
+
+<img src="README_files/figure-html/unnamed-chunk-10-1.png" title="" alt="" width="500px" />
+
+* `geom_line`
+
+<img src="README_files/figure-html/unnamed-chunk-11-1.png" title="" alt="" width="500px" />
+
+* `geom_step`
+
+<img src="README_files/figure-html/unnamed-chunk-12-1.png" title="" alt="" width="500px" />
+
+* `geom_text`
+
+<img src="README_files/figure-html/unnamed-chunk-13-1.png" title="" alt="" width="500px" />
+
+Bivariate plotting in the micromap package is possible by addiing additional variable names to the `panel.data` argument and using an appropriate geom in the `panel.types` argument.  For example, `panel.types=c("labels", "point", "map")` and `panel.data = list("state", c("pov", "ed"), NA)` will produce a scatterplot of poverty  (x) by education (y).  
+
+Appropriate geoms for bivariate relationships include:
+
+* `geom_point`
+
+<img src="README_files/figure-html/unnamed-chunk-14-1.png" title="" alt="" width="450px" />
+
+* `geom_bin2d` number of observations defined by bins in two-dimensions
+
+<img src="README_files/figure-html/unnamed-chunk-15-1.png" title="" alt="" width="450px" />
+
+* `geom_count` number or proportion of observations defined by all combinations in two-dimensions
+
+<img src="README_files/figure-html/unnamed-chunk-16-1.png" title="" alt="" width="450px" />
+
+* `geom_density_2d`
+
+<img src="README_files/figure-html/unnamed-chunk-17-1.png" title="" alt="" width="450px" />
+
+* `geom_hex` Same as `bin2d` but two-dimensional locations are shown as hexagons
+
+<img src="README_files/figure-html/unnamed-chunk-18-1.png" title="" alt="" width="450px" />
+
+* `geom_path` 
+
+<img src="README_files/figure-html/unnamed-chunk-19-1.png" title="" alt="" width="450px" />
+
 ### EPA Disclaimer
 
 The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity , confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recomendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.
@@ -81,7 +166,3 @@ By submitting a pull request, you make an agreement with EPA that you will not s
 ### License
 
 This project is licensed under the GNU General Public License, [GPL-2](http://cran.r-project.org/web/licenses/GPL-2). 
-
-### Issues
-
-* fixed aspect ratio of maps - this is a gtable issue? see [here](https://github.com/hadley/gtable/issues/51) and [here](http://stackoverflow.com/questions/34686539/gtable-rbind-cbind-with-fixed-coordinates)

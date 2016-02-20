@@ -11,6 +11,13 @@
 # conf limits for plots if appropriate
 # plot aesthetics - look at how maggrittr does it
 
+## notes
+# bin 2d - supply bins, binwidth arg? 
+# optional argument for color ramp of
+# bivariate geoms where id of categories not relevant (bin2d, include labels with ggrepl?)
+
+# three dimensional relationships (requires a z variable) - geom_contour, geom_tile, geom_raster, geom_rect
+
 ##
 # some tests
 
@@ -22,6 +29,8 @@ data("USstates")
 statePolys <- create_map_table(USstates, IDcolumn="ST") 
 
 ##
+# nominal 
+
 # standard
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "point","point", "map"),
@@ -69,7 +78,69 @@ mmplot(stat.data=edPov, map.data=statePolys,
 )
 
 ##
-# test different panel types 4
+# bivariate
+
+## 
+# points
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "point", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID")
+)
+
+## 
+# bin2d
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "bin2d", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID"),
+  flip = T
+)
+
+## 
+# count
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "count", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID"),
+  flip = T
+)
+
+## 
+# density_2d
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "density_2d", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID"),
+  flip = T
+)
+
+##
+# hex
+
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "hex", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID")
+)
+
+##
+# path
+
+mmplot(stat.data=edPov, map.data=statePolys,
+  panel.types=c("labels", "path", "map"),
+  panel.data=list("state", c("pov", "ed"), NA),
+  ord.by="ed", grouping=17,
+  map.link=c("StateAb","ID")
+)
+
+## 
+# points and dot_legend
 mmplot(stat.data=edPov, map.data=statePolys,
   panel.types=c("labels", "dot_legend", "point", "map"),
   panel.data=list("state", NA, c("pov", "ed"), NA),
@@ -88,6 +159,19 @@ national.polys<-transform(national.polys, ID="National", region=4,
 poly=region*1000 + poly)
 wsa.polys<-rbind(wsa.polys,national.polys)
 data("vegCov")
+
+## 
+# points and dot_legend
+mmplot(stat.data=vegCov, map.data=wsa.polys,
+  panel.types=c("map", "labels", "bar", "bar"),
+  panel.data=list(NA, "Category", 'Estimate.P', 'Estimate.U'),
+  ord.by="ed", grouping=17,
+  map.link=c("Subpopulation", "ID"),
+  cat = "Category"
+)
+
+
+
 
 # standard plot, ok
 mmgroupedplot(stat.data=vegCov,
