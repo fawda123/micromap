@@ -1,4 +1,4 @@
-#' Builds panels
+﻿#' Builds panels
 #' 
 #' Creates a panel of the user specified type using the attribute list to make
 #' adjustments.
@@ -441,7 +441,7 @@ bar_cl_build <- function(pl, p, DF, att){
 				xmax=tmp.data1, ymax=-pGrpOrd+(tmp.adj/2), 
 				fill=factor(color), colour='black')) +
 	     	geom_errorbarh(aes(xmin=tmp.data2, xmax=tmp.data3, y=-pGrpOrd), 
-				height=.9*att[[p]]$graph.bar.size) + 
+				width=.9*att[[p]]$graph.bar.size) +
 	     	facet_grid(pGrp~., scales="free_y", space="free") +
 		scale_colour_manual(values='black', guide='none') +
 		scale_fill_manual(values=att$colors, guide='none')
@@ -517,7 +517,7 @@ box_summary_build <- function(pl, p, DF, att){
 	pl  <- 
 		ggplot(DF) +
 	     	geom_errorbarh(aes(xmin=tmp.data1, xmax=tmp.data7, y=-pGrpOrd), 
-				height=.9*att[[p]]$graph.bar.size) + 
+				width=.9*att[[p]]$graph.bar.size) +
 		geom_rect(aes(xmin=tmp.data2, ymin=-pGrpOrd-(tmp.adj/4), 
 					xmax=tmp.data5, ymax=-pGrpOrd+(tmp.adj/4), 
 					fill=factor(color), colour='black')) +
